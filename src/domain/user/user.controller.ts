@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { loginDto } from './dto/request.login.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -11,13 +11,13 @@ export class UserController {
   @ApiOperation({ summary: '회원가입/로그인' })
   // @ApiBearerAuth('access-token')
   @Post('signup')
-  async signup(dto: loginDto) {
-    return this.userService.signup(dto);
+  async signup(@Body() body: loginDto) {
+    return this.userService.signup(body);
   }
 
   @ApiOperation({ summary: '로그인' })
   @Post('login')
-  async login(dto: loginDto) {
-    return this.userService.login(dto);
+  async login(@Body() body: loginDto) {
+    return this.userService.login(body);
   }
 }
