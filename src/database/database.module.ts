@@ -10,14 +10,14 @@ import { UserAreas } from 'src/domain/entities/userArea';
 
 const databaseModule = TypeOrmModule.forRootAsync({
   inject: [ConfigService],
-  useFactory: async (configService: ConfigService) => {
+  useFactory: () => {
     return {
-      type: 'mysql',
-      host: '127.0.0.1',
-      port: 3306,
-      username: configService.get('DB_USERNAME'),
-      password: configService.get('DB_PASSWORD'),
-      database: configService.get('DB_DATABASE'),
+      type: 'postgres',
+      host: process.env.DB_HOST_POSTGRES,
+      port: 5432,
+      username: process.env.DB_USERNAME_POSTGRES,
+      password: process.env.DB_PASSWORD_POSTGRES,
+      database: process.env.DB_DATABASE_POSTGRES,
       entities: [Users, Chats, Areas, ChatUsers, Statuses, UserAreas],
       autoLoadEntities: true,
       charset: 'utf8mb4',
