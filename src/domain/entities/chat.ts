@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { ChatUsers } from './chatUser';
 import { Statuses } from './status';
+import { Areas } from './area';
 
 @Entity('chats')
 export class Chats {
@@ -21,14 +22,26 @@ export class Chats {
   @Column('varchar', { name: 'orderLink' })
   orderLink: string;
 
+  @Column('varchar', { name: 'longitude' })
+  longitude: string;
+
+  @Column('varchar', { name: 'latitude' })
+  latitude: string;
+
+  @Column('varchar', { name: 'restaurantName' })
+  restaurantName: string;
+
+  @Column('varchar', { name: 'categoryProfile' })
+  categoryProfile: string;
+
+  @Column('int', { name: 'max' })
+  max: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
   @Column()
   dueDate: Date;
-
-  @Column('boolean', { name: 'isPrivate' })
-  isPrivate: boolean;
 
   @Column('int', { name: 'StatusId' })
   StatusId: number;
@@ -39,6 +52,16 @@ export class Chats {
   })
   @JoinColumn([{ name: 'StatusId', referencedColumnName: 'id' }])
   Status: Statuses;
+
+  @Column('int', { name: 'AreaId' })
+  AreaId: number;
+
+  @ManyToOne(() => Areas, (area) => area.Chat, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'AreaId', referencedColumnName: 'id' }])
+  Area: Areas;
 
   @OneToMany(() => ChatUsers, (chatUser) => chatUser.Chat)
   ChatUser: ChatUsers[];
