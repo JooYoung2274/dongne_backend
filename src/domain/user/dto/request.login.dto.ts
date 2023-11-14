@@ -11,36 +11,37 @@ import { CreateDateColumn } from 'typeorm';
 export class loginDto {
   @IsEmail()
   @Matches(/^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)
-  @ApiProperty({ description: 'email' })
+  @ApiProperty({ description: 'email', required: true, nullable: false })
   email: string;
 
   @IsString()
-  @ApiProperty({ description: '닉네임' })
+  @ApiProperty({ description: '닉네임', required: true, nullable: false })
   nickname: string;
 
   @IsString()
-  @ApiProperty({ description: '전화번호' })
+  @ApiProperty({ description: '전화번호', required: true, nullable: false })
   phoneNo: string;
 
   @CreateDateColumn()
   @ApiProperty({ description: '가입일' })
   createdAt: Date;
 
+  @IsOptional()
   @IsString()
-  @ApiProperty({ description: '프로필 사진' })
+  @ApiProperty({ description: '프로필 사진', nullable: true })
   profileImage: string;
 
   @IsBoolean()
-  @ApiProperty({ description: '정보 수신 동의' })
+  @ApiProperty({ description: '정보 수신 동의', nullable: false })
   newsNotification: boolean;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '푸시 토큰', nullable: true })
+  @ApiProperty({ description: '푸시 토큰', required: false, nullable: true })
   pushToken: string;
 
   @IsString()
-  @ApiProperty({ description: '역할' })
+  @ApiProperty({ description: '역할', required: true, nullable: false })
   role: string;
 
   @IsOptional()
