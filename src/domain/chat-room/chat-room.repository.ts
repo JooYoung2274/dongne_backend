@@ -50,4 +50,16 @@ export class ChatRoomRepository {
     await this.chatUserRepository.save(newChatUser);
     return newChatUser;
   }
+
+  async getChatRoomList(AreaId: number): Promise<Chats[]> {
+    const result = await this.chatRepository
+      .createQueryBuilder('chat')
+      .leftJoin('chat.chatUsers', 'chatUser')
+      .leftJoin('chatUser.users', 'user')
+      .leftJoin('user.userAreas', 'userArea')
+      .where('userArea.AreaId = :AreaId', { AreaId })
+      .getMany();
+
+    return result;
+  }
 }
