@@ -23,7 +23,6 @@ const databaseModule = TypeOrmModule.forRootAsync({
       charset: 'utf8mb4',
       synchronize: true,
       logging: true,
-      // keepConnectionAlive: true,
     };
   },
 });

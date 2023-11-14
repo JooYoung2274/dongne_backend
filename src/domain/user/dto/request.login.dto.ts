@@ -6,42 +6,70 @@ import {
   IsString,
   Matches,
 } from 'class-validator';
-import { CreateDateColumn } from 'typeorm';
 
 export class loginDto {
   @IsEmail()
   @Matches(/^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)
-  @ApiProperty({ description: 'email', required: true, nullable: false })
+  @ApiProperty({
+    description: 'email',
+    required: true,
+    nullable: false,
+    example: 'test@test.com',
+  })
   email: string;
 
   @IsString()
-  @ApiProperty({ description: '닉네임', required: true, nullable: false })
+  @ApiProperty({
+    description: '닉네임',
+    required: true,
+    nullable: false,
+    example: '테스트닉네임',
+  })
   nickname: string;
 
   @IsString()
-  @ApiProperty({ description: '전화번호', required: true, nullable: false })
+  @ApiProperty({
+    description: '전화번호',
+    required: true,
+    nullable: false,
+    example: '01012345678',
+  })
   phoneNo: string;
-
-  @CreateDateColumn()
-  @ApiProperty({ description: '가입일' })
-  createdAt: Date;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '프로필 사진', nullable: true })
+  @ApiProperty({
+    description: '프로필 사진',
+    nullable: true,
+    example: 'http://test.com/test.png',
+  })
   profileImage: string;
 
   @IsBoolean()
-  @ApiProperty({ description: '정보 수신 동의', nullable: false })
+  @ApiProperty({
+    description: '정보 수신 동의',
+    nullable: false,
+    required: true,
+  })
   newsNotification: boolean;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '푸시 토큰', required: false, nullable: true })
+  @ApiProperty({
+    description: '푸시 토큰',
+    required: false,
+    nullable: true,
+    example: null,
+  })
   pushToken: string;
 
   @IsString()
-  @ApiProperty({ description: '역할', required: true, nullable: false })
+  @ApiProperty({
+    description: '역할',
+    required: true,
+    nullable: false,
+    example: 'USER',
+  })
   role: string;
 
   @IsOptional()
@@ -49,31 +77,32 @@ export class loginDto {
   @ApiProperty({
     description: '소셜로그인에서 받아온 oauth id token',
     nullable: true,
+    example: null,
   })
   idToken: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '비밀번호', nullable: true })
+  @ApiProperty({ description: '비밀번호', nullable: true, example: '1234fff' })
   password: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'kakaoId', nullable: true })
+  @ApiProperty({ description: 'kakaoId', nullable: true, example: null })
   kakaoId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'naverId', nullable: true })
+  @ApiProperty({ description: 'naverId', nullable: true, example: null })
   naverId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'appleId', nullable: true })
+  @ApiProperty({ description: 'appleId', nullable: true, example: null })
   appleId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'refreshToken', nullable: true })
+  @ApiProperty({ description: 'refreshToken', nullable: true, example: null })
   refreshToken: string;
 }
