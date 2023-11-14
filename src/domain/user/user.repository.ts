@@ -3,11 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from '../entities/user';
 import { Repository } from 'typeorm';
 import { loginDto } from './dto/request.login.dto';
+import { UserAreas } from '../entities/userArea';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
+    @InjectRepository(UserAreas)
+    private userAreaRepository: Repository<UserAreas>,
   ) {}
 
   async findOneByEmail(email: string): Promise<Users> {
@@ -38,5 +41,17 @@ export class UserRepository {
 
     await this.userRepository.save(newUser);
     return newUser;
+  }
+
+  async findUserAreaByUserId(userId: number): Promise<UserAreas> {
+    const result = await this.userAreaRepository.findOne({
+      where: { UserId: userId },
+    });
+    return result;
+  }
+
+  async findOneById(id: number) {
+    const result = await this.userRepository.findOne({ where: { id } });
+    return result;
   }
 }

@@ -7,6 +7,7 @@ import { UserRepository } from './user.repository';
 import { Users } from '../entities/user';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { GoogleStrategy } from './passport/google.strategy';
+import { UserAreas } from '../entities/userArea';
 
 @Module({
   imports: [
@@ -16,9 +17,10 @@ import { GoogleStrategy } from './passport/google.strategy';
         signOptions: { expiresIn: '7d' },
       }),
     }),
-    TypeOrmModule.forFeature([Users]),
+    TypeOrmModule.forFeature([Users, UserAreas]),
   ],
   providers: [UserService, UserRepository, GoogleStrategy, JwtStrategy],
   controllers: [UserController],
+  exports: [UserRepository],
 })
 export class UserModule {}
