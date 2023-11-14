@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserAreas } from './userArea';
+import { Chats } from './chat';
 
 @Entity('areas')
 export class Areas {
@@ -23,4 +24,7 @@ export class Areas {
 
   @OneToMany(() => UserAreas, (userArea) => userArea.Area)
   UserArea: UserAreas[];
+
+  @OneToMany(() => Chats, (chat) => chat.Area)
+  Chat: Chats[];
 }
