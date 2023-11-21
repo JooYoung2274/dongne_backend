@@ -8,6 +8,8 @@ import { Users } from '../entities/user';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { GoogleStrategy } from './passport/google.strategy';
 import { UserAreas } from '../entities/userArea';
+import { Areas } from '../entities/area';
+import { AxiosClass } from 'src/util/axios.class';
 
 @Module({
   imports: [
@@ -17,9 +19,15 @@ import { UserAreas } from '../entities/userArea';
         signOptions: { expiresIn: '7d' },
       }),
     }),
-    TypeOrmModule.forFeature([Users, UserAreas]),
+    TypeOrmModule.forFeature([Users, UserAreas, Areas]),
   ],
-  providers: [UserService, UserRepository, GoogleStrategy, JwtStrategy],
+  providers: [
+    UserService,
+    UserRepository,
+    GoogleStrategy,
+    JwtStrategy,
+    AxiosClass,
+  ],
   controllers: [UserController],
   exports: [UserRepository],
 })

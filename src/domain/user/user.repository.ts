@@ -1,14 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from '../entities/user';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { loginDto } from './dto/request.login.dto';
 import { UserAreas } from '../entities/userArea';
+import { checkAddressDto } from './dto/request.checkAddress.dto';
+import { Areas } from '../entities/area';
+import { setAddressDto } from './dto/request.setAddress.dto';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
+    @InjectRepository(Areas) private areaRepository: Repository<Areas>,
     @InjectRepository(UserAreas)
     private userAreaRepository: Repository<UserAreas>,
   ) {}
@@ -53,5 +57,57 @@ export class UserRepository {
   async findOneById(id: number) {
     const result = await this.userRepository.findOne({ where: { id } });
     return result;
+  }
+
+  async findArea(body: checkAddressDto): Promise<Areas> {
+    const { city, state, address } = body;
+    const result = await this.areaRepository.findOne({
+      where: { city, state, address },
+    });
+    return result;
+  }
+
+  async createArea(
+    body: checkAddressDto,
+    longitude: string,
+    latitude: string,
+  ): Promise<Areas> {
+    const { city, state, address, apartmentName } = body;
+    const newArea = this.areaRepository.create();
+    newArea.city = city;
+    newArea.state = state;
+    newArea.address = address;
+    newArea.apartmentName = apartmentName;
+    newArea.longitude = longitude;
+    newArea.latitude = latitude;
+    await this.areaRepository.save(newArea);
+    return newArea;
+  }
+
+  async createUserArea(
+    body: setAddressDto,
+    userId: number,
+    queryRunner?: QueryRunner,
+  ): Promise<UserAreas> {
+    const { areaId } = body;
+    const newUserArea = queryRunner.manager.create(UserAreas);
+    newUserArea.AreaId = areaId;
+    newUserArea.UserId = userId;
+    await queryRunner.manager.save(newUserArea);
+    return newUserArea;
+  }
+
+  async findAreaByUserId(userId: number): Promise<Areas> {
+    const result = await this.areaRepository
+      .createQueryBuilder('area')
+      .leftJoin('area.UserArea', 'userArea')
+      .leftJoin('userArea.User', 'user')
+      .where('user.id = :userId', { userId })
+      .getOne();
+    return result;
+  }
+
+  async deleteUserArea(userId: number, queryRunner?: QueryRunner) {
+    await queryRunner.manager.delete(UserAreas, { UserId: userId });
   }
 }
