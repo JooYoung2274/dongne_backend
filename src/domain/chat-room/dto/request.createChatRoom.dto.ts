@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class createChatRoomDto {
   @IsString()
@@ -33,4 +33,14 @@ export class createChatRoomDto {
   @IsString()
   @ApiProperty({ description: '마감시간', required: true, nullable: false })
   dueDate: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ description: '위도', required: false, nullable: true })
+  latitude: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiProperty({ description: '경도', required: false, nullable: true })
+  longitude: string;
 }
