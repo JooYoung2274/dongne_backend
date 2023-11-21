@@ -42,4 +42,15 @@ export class ChatRoomController {
   ): Promise<ChatUsers> {
     return await this.chatRoomService.joinChatRoom(body, user);
   }
+
+  @ApiOperation({ summary: '채팅방 나가기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Post('leave')
+  async leaveChatRoom(
+    @Body() body: joinChatRoomDto,
+    @User() user,
+  ): Promise<ChatUsers> {
+    return await this.chatRoomService.leaveChatRoom(body, user);
+  }
 }
