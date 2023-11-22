@@ -19,6 +19,18 @@ export class Areas {
   @Column('varchar', { name: 'state' })
   state: string;
 
+  @Column('varchar', { name: 'address' })
+  address: string;
+
+  @Column('varchar', { name: 'longitude' })
+  longitude: string;
+
+  @Column('varchar', { name: 'latitude' })
+  latitude: string;
+
+  @Column('varchar', { name: 'apartmentName' })
+  apartmentName: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

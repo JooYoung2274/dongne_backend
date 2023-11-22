@@ -14,14 +14,8 @@ export class ChatRoomRepository {
     private chatUserRepository: Repository<ChatUsers>,
   ) {}
 
-  async createChatRoom(
-    body: createChatRoomDto,
-    longitude: string,
-    latitude: string,
-  ): Promise<Chats> {
+  async createChatRoom(body: createChatRoomDto): Promise<Chats> {
     const newChatRoom = this.chatRepository.create();
-    newChatRoom.longitude = longitude;
-    newChatRoom.latitude = latitude;
     newChatRoom.categoryProfile = CATEGORY_PROFILE[body.category];
     newChatRoom.StatusId = 1;
     newChatRoom.title = body.title;
