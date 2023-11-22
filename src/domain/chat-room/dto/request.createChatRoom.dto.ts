@@ -3,19 +3,39 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class createChatRoomDto {
   @IsString()
-  @ApiProperty({ description: '채팅방이름', required: true, nullable: false })
+  @ApiProperty({
+    description: '채팅방이름',
+    required: true,
+    nullable: false,
+    example: '진접읍 비비큐 드실분',
+  })
   title: string;
 
   @IsString()
-  @ApiProperty({ description: '메뉴카테고리', required: true, nullable: false })
+  @ApiProperty({
+    description: '메뉴카테고리',
+    required: true,
+    nullable: false,
+    example: '치킨',
+  })
   category: string;
 
   @IsNumber()
-  @ApiProperty({ description: '최대인원', required: true, nullable: false })
+  @ApiProperty({
+    description: '최대인원',
+    required: true,
+    nullable: false,
+    example: 4,
+  })
   max: number;
 
   @IsNumber()
-  @ApiProperty({ description: '지역Id', required: true, nullable: false })
+  @ApiProperty({
+    description: '지역Id',
+    required: true,
+    nullable: false,
+    example: 1,
+  })
   AreaId: number;
 
   @IsString()
@@ -23,24 +43,45 @@ export class createChatRoomDto {
     description: '함께주문 링크',
     required: true,
     nullable: false,
+    example: 'https://함께주문링크입니다',
   })
   orderLink: string;
 
   @IsString()
-  @ApiProperty({ description: '상호명', required: true, nullable: false })
+  @ApiProperty({
+    description: '상호명',
+    required: true,
+    nullable: false,
+    example: '비비큐 진접점',
+  })
   restaurantName: string;
 
   @IsString()
-  @ApiProperty({ description: '마감시간', required: true, nullable: false })
+  @ApiProperty({
+    description: '마감시간',
+    required: true,
+    nullable: false,
+    example: new Date(),
+  })
   dueDate: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '위도', required: false, nullable: true })
+  @ApiProperty({
+    description: '위도',
+    required: false,
+    nullable: true,
+    example: '37.123456',
+  })
   latitude: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '경도', required: false, nullable: true })
+  @ApiProperty({
+    description: '경도',
+    required: false,
+    nullable: true,
+    example: '127.123456',
+  })
   longitude: string;
 }

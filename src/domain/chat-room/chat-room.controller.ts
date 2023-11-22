@@ -50,7 +50,8 @@ export class ChatRoomController {
   async leaveChatRoom(
     @Body() body: joinChatRoomDto,
     @User() user,
-  ): Promise<ChatUsers> {
-    return await this.chatRoomService.leaveChatRoom(body, user);
+  ): Promise<void> {
+    await this.chatRoomService.leaveChatRoom(body, user);
+    return;
   }
 }

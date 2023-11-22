@@ -20,6 +20,8 @@ export class ChatRoomRepository {
     newChatRoom.StatusId = 1;
     newChatRoom.title = body.title;
     newChatRoom.orderLink = body.orderLink;
+    newChatRoom.longitude = body.longitude;
+    newChatRoom.latitude = body.latitude;
     newChatRoom.restaurantName = body.restaurantName;
     newChatRoom.max = body.max;
     newChatRoom.dueDate = new Date(body.dueDate);
@@ -29,7 +31,7 @@ export class ChatRoomRepository {
     return newChatRoom;
   }
 
-  async findChatRoomByUserId(userId: number): Promise<ChatUsers> {
+  async findChatUserByUserId(userId: number): Promise<ChatUsers> {
     const result = await this.chatUserRepository.findOne({
       where: { UserId: userId },
     });
@@ -48,12 +50,16 @@ export class ChatRoomRepository {
   async getChatRoomList(AreaId: number): Promise<Chats[]> {
     const result = await this.chatRepository
       .createQueryBuilder('chat')
-      .leftJoin('chat.chatUsers', 'chatUser')
-      .leftJoin('chatUser.users', 'user')
-      .leftJoin('user.userAreas', 'userArea')
+      .leftJoin('chat.ChatUser', 'chatUser')
+      .leftJoin('chatUser.User', 'user')
+      .leftJoin('user.UserArea', 'userArea')
       .where('userArea.AreaId = :AreaId', { AreaId })
       .getMany();
 
     return result;
+  }
+
+  async deleteChatUser(chatUserId): Promise<void> {
+    await this.chatUserRepository.delete(chatUserId);
   }
 }
