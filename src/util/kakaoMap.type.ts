@@ -2,7 +2,9 @@ export interface AddressResponse {
   documents: Array<{
     address_name: string;
     address_type: 'REGION' | 'ROAD' | 'REGION_ADDR' | 'ROAD_ADDR';
-    y: string;
+    place_name?: string;
+    x?: string;
+    y?: string;
     address: {
       address_name: string;
       region_1depth_name: string;

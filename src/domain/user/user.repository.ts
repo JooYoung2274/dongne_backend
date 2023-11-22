@@ -60,9 +60,9 @@ export class UserRepository {
   }
 
   async findArea(body: checkAddressDto): Promise<Areas> {
-    const { city, state, address } = body;
+    const { city, state, address, apartmentName } = body;
     const result = await this.areaRepository.findOne({
-      where: { city, state, address },
+      where: { city, state, address, apartmentName },
     });
     return result;
   }

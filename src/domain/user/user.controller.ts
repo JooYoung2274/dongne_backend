@@ -64,7 +64,12 @@ export class UserController {
   @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard('jwt'))
   @Get('getMarketAddress/:address')
-  async getMarketAddress(@Param('address') address: string) {
+  async getMarketAddress(@Param('address') address: string): Promise<{
+    placeName: string;
+    addressName: string;
+    longitude: string;
+    latitude: string;
+  }> {
     return await this.userService.getMarketAddress(address);
   }
 }

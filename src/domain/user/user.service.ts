@@ -81,7 +81,7 @@ export class UserService {
   async createTokens(
     id: number,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const payload = { sub: id };
+    const payload = { id: id };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET,
@@ -100,6 +100,11 @@ export class UserService {
         { query: body.address },
         `KakaoAK ${this.KAKAP_KEY}`,
       );
+
+      if (!isKakaoMapData.documents.length) {
+        throw new BadRequestException('주소를 찾을 수 없습니다.');
+      }
+
       const longitude = isKakaoMapData?.documents[0]?.road_address?.x;
       const latitude = isKakaoMapData?.documents[0]?.road_address?.y;
 
@@ -127,33 +132,44 @@ export class UserService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
+    const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
+
     try {
-      await this.userRepository.deleteUserArea(user.id, queryRunner);
+      if (isUserArea) {
+        await this.userRepository.deleteUserArea(user.id, queryRunner);
+      }
       await this.userRepository.createUserArea(body, user.id, queryRunner);
 
       await queryRunner.commitTransaction();
+      return;
     } catch (error) {
-      await queryRunner.rollbackTransaction();
-
       throw new BadRequestException('주소 설정에 실패했습니다.');
     } finally {
       await queryRunner.release();
     }
-
-    return;
   }
 
-  async getMarketAddress(
-    address: string,
-  ): Promise<{ address: string; longitude: string; latitude: string }> {
+  async getMarketAddress(address: string): Promise<{
+    placeName: string;
+    addressName: string;
+    longitude: string;
+    latitude: string;
+  }> {
     const isKakaoMapData = await this.axiosClass.get<AddressResponse>(
-      'https://dapi.kakao.com/v2/local/search/address.json',
+      'https://dapi.kakao.com/v2/local/search/keyword.json',
       { query: address },
       `KakaoAK ${this.KAKAP_KEY}`,
     );
-    const longitude = isKakaoMapData?.documents[0]?.road_address?.x;
-    const latitude = isKakaoMapData?.documents[0]?.road_address?.y;
 
-    return { address, longitude, latitude };
+    if (!isKakaoMapData.documents.length) {
+      throw new BadRequestException('주소를 찾을 수 없습니다.');
+    }
+    console.log(isKakaoMapData.documents[0]);
+    const addressName = isKakaoMapData?.documents[0]?.address_name;
+    const placeName = isKakaoMapData?.documents[0]?.place_name;
+    const longitude = isKakaoMapData?.documents[0]?.x;
+    const latitude = isKakaoMapData?.documents[0]?.y;
+
+    return { placeName, addressName, longitude, latitude };
   }
 }

@@ -15,7 +15,7 @@ export class ChatRoomService {
   ) {}
 
   async createChatRoom(body: createChatRoomDto, user): Promise<Chats> {
-    const isChatRoom = await this.chatRoomRepository.findChatRoomByUserId(
+    const isChatRoom = await this.chatRoomRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -36,7 +36,7 @@ export class ChatRoomService {
   }
 
   async joinChatRoom(body: joinChatRoomDto, user): Promise<ChatUsers> {
-    const isChatUser = await this.chatRoomRepository.findChatRoomByUserId(
+    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -48,5 +48,22 @@ export class ChatRoomService {
       body.ChatRoomId,
       user.id,
     );
+  }
+
+  async leaveChatRoom(body: joinChatRoomDto, user): Promise<void> {
+    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+      user.id,
+    );
+
+    if (!isChatUser) {
+      throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
+    }
+
+    if (isChatUser.ChatId !== body.ChatRoomId) {
+      throw new BadRequestException('잘못된 접근입니다');
+    }
+
+    await this.chatRoomRepository.deleteChatUser(isChatUser.id);
+    return;
   }
 }
