@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { createChatRoomDto } from './dto/request.createChatRoom.dto';
 import { CATEGORY_PROFILE } from 'src/constant/category-profile';
 import { ChatUsers } from '../entities/chatUser';
+import { ChatRecords } from '../entities/chatRecord';
 
 @Injectable()
 export class ChatRoomRepository {
@@ -12,6 +13,7 @@ export class ChatRoomRepository {
     @InjectRepository(Chats) private chatRepository: Repository<Chats>,
     @InjectRepository(ChatUsers)
     private chatUserRepository: Repository<ChatUsers>,
+    private chatRecordRepository: Repository<ChatRecords>,
   ) {}
 
   async createChatRoom(body: createChatRoomDto): Promise<Chats> {
@@ -61,5 +63,18 @@ export class ChatRoomRepository {
 
   async deleteChatUser(chatUserId): Promise<void> {
     await this.chatUserRepository.delete(chatUserId);
+  }
+
+  async createChatRecord(
+    chatId: number,
+    message: string,
+    userId: number,
+  ): Promise<void> {
+    const newChatRecord = this.chatRecordRepository.create();
+    newChatRecord.ChatId = chatId;
+    newChatRecord.message = message;
+    newChatRecord.UserId = userId;
+
+    await this.chatRecordRepository.save(newChatRecord);
   }
 }
