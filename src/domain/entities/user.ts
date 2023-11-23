@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { UserAreas } from './userArea';
 import { ChatUsers } from './chatUser';
+import { ChatRecords } from './chatRecord';
 
 @Entity('users')
 export class Users {
@@ -63,4 +64,7 @@ export class Users {
 
   @OneToMany(() => ChatUsers, (chatUser) => chatUser.User)
   ChatUser: ChatUsers[];
+
+  @OneToMany(() => ChatRecords, (chatRecord) => chatRecord.User)
+  ChatRecord: ChatRecords[];
 }
