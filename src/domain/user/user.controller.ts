@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { loginDto } from './dto/request.login.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { checkAddressDto } from './dto/request.checkAddress.dto';
 import { Areas } from '../entities/area';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,6 +22,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: '회원가입/로그인' })
+  @ApiBody({ type: loginDto })
   @Post('signup')
   async signup(@Body() body: loginDto) {
     return this.userService.signup(body);

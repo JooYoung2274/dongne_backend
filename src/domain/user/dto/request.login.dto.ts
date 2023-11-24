@@ -74,31 +74,61 @@ export class loginDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'googleId', nullable: true, example: null })
+  @ApiProperty({
+    description: 'googleId',
+    nullable: true,
+    required: false,
+    example: null,
+  })
   googleId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: '비밀번호', nullable: true, example: '1234fff' })
+  @ApiProperty({
+    description: '비밀번호',
+    nullable: true,
+    required: false,
+    example: '1234fff',
+  })
   password: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'kakaoId', nullable: true, example: null })
+  @ApiProperty({
+    description: 'kakaoId',
+    nullable: true,
+    required: false,
+    example: null,
+  })
   kakaoId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'naverId', nullable: true, example: null })
+  @ApiProperty({
+    description: 'naverId',
+    nullable: true,
+    required: false,
+    example: null,
+  })
   naverId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'appleId', nullable: true, example: null })
+  @ApiProperty({
+    description: 'appleId',
+    nullable: true,
+    required: false,
+    example: null,
+  })
   appleId: string;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({ description: 'refreshToken', nullable: true, example: null })
+  @ApiProperty({
+    description: 'refreshToken',
+    nullable: true,
+    required: false,
+    example: null,
+  })
   refreshToken: string;
 }
