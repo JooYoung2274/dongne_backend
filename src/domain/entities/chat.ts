@@ -10,6 +10,7 @@ import {
 import { ChatUsers } from './chatUser';
 import { Statuses } from './status';
 import { Areas } from './area';
+import { ChatRecords } from './chatRecord';
 
 @Entity('chats')
 export class Chats {
@@ -65,4 +66,7 @@ export class Chats {
 
   @OneToMany(() => ChatUsers, (chatUser) => chatUser.Chat)
   ChatUser: ChatUsers[];
+
+  @OneToMany(() => ChatRecords, (chatRecord) => chatRecord.Chat)
+  ChatRecord: ChatRecords[];
 }

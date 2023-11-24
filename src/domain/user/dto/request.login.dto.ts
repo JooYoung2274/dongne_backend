@@ -74,12 +74,8 @@ export class loginDto {
 
   @IsOptional()
   @IsString()
-  @ApiProperty({
-    description: '소셜로그인에서 받아온 oauth id token',
-    nullable: true,
-    example: null,
-  })
-  idToken: string;
+  @ApiProperty({ description: 'googleId', nullable: true, example: null })
+  googleId: string;
 
   @IsOptional()
   @IsString()

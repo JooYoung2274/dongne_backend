@@ -27,6 +27,17 @@ export class UserRepository {
     return result;
   }
 
+  async findOneByOauthId(kakaoId, naverId, googleId, appleId) {
+    const result = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.kakaoId = :kakaoId', { kakaoId })
+      .orWhere('user.naverId = :naverId', { naverId })
+      .orWhere('user.googleId = :googleId', { googleId })
+      .orWhere('user.appleId = :appleId', { appleId })
+      .getOne();
+    return result;
+  }
+
   async createUser(dto: loginDto): Promise<Users> {
     const newUser = await this.userRepository.create();
     newUser.email = dto.email;
@@ -37,7 +48,7 @@ export class UserRepository {
     newUser.phoneNo = dto.phoneNo;
     newUser.password = dto.password;
     newUser.pushToken = dto.pushToken;
-    newUser.idToken = dto.idToken;
+    newUser.googleId = dto.googleId;
     newUser.kakaoId = dto.kakaoId;
     newUser.naverId = dto.naverId;
     newUser.appleId = dto.appleId;

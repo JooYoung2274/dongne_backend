@@ -23,10 +23,15 @@ export class UserService {
   async login(
     dto: loginDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
-    const { kakaoId, naverId, appleId, email, password } = dto;
+    const { kakaoId, naverId, appleId, googleId, email, password } = dto;
+    const isUser = await this.userRepository.findOneByOauthId(
+      kakaoId,
+      naverId,
+      googleId,
+      appleId,
+    );
 
-    const isUser = await this.userRepository.findOneByEmail(email);
-    if (!kakaoId && !naverId && !appleId) {
+    if (!kakaoId && !naverId && !appleId && !googleId) {
       if (!isUser) {
         throw new BadRequestException('가입 해주세요');
       }
@@ -40,6 +45,21 @@ export class UserService {
     }
 
     if (!isUser) {
+      const isUserEmail = await this.userRepository.findOneByEmail(email);
+
+      const oauth = isUserEmail.kakaoId
+        ? '카카오'
+        : isUserEmail.naverId
+        ? '네이버'
+        : isUserEmail.appleId
+        ? '애플'
+        : '구글';
+
+      if (isUserEmail) {
+        throw new BadRequestException(
+          `이미 ${oauth}로 가입해 사용중인 이메일입니다.`,
+        );
+      }
       const newUser = await this.userRepository.createUser(dto);
       return await this.createTokens(newUser.id);
     }

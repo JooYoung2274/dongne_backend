@@ -44,6 +44,14 @@ export class ChatRoomService {
       throw new BadRequestException('이미 참여하고 있는 채팅방이 존재합니다');
     }
 
+    const isUser = await this.userRepository.findOneById(user.id);
+
+    // 채팅기록 db에 message 저장
+    await this.chatRoomRepository.createChatRecord(
+      body.ChatRoomId,
+      `${isUser.nickname}님이 입장하셨습니다.`,
+      user.id,
+    );
     return await this.chatRoomRepository.createChatUser(
       body.ChatRoomId,
       user.id,
@@ -63,7 +71,28 @@ export class ChatRoomService {
       throw new BadRequestException('잘못된 접근입니다');
     }
 
+    const isUser = await this.userRepository.findOneById(user.id);
+
+    // 채팅기록 db에 message 저장
+    await this.chatRoomRepository.createChatRecord(
+      body.ChatRoomId,
+      `${isUser.nickname}님이 퇴장하셨습니다.`,
+      user.id,
+    );
+
     await this.chatRoomRepository.deleteChatUser(isChatUser.id);
     return;
+  }
+
+  async getChatRecord(user): Promise<number> {
+    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+      user.id,
+    );
+
+    if (!isChatUser) {
+      throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
+    }
+
+    return isChatUser.ChatId;
   }
 }

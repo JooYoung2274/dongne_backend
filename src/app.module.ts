@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './domain/user/user.module';
 import { ChatRoomModule } from './domain/chat-room/chat-room.module';
+import { EventsModule } from './domain/chat/chat.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ChatRoomModule } from './domain/chat-room/chat-room.module';
     DatabaseModule.forRoot(),
     UserModule,
     ChatRoomModule,
+    EventsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

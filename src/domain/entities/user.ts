@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { UserAreas } from './userArea';
 import { ChatUsers } from './chatUser';
+import { ChatRecords } from './chatRecord';
 
 @Entity('users')
 export class Users {
@@ -28,8 +29,8 @@ export class Users {
   @Column('varchar', { name: 'pushToken', nullable: true })
   pushToken: string;
 
-  @Column('varchar', { name: 'idToken', nullable: true })
-  idToken: string;
+  @Column('varchar', { name: 'googleId', nullable: true })
+  googleId: string;
 
   @Column('varchar', { name: 'kakaoId', nullable: true })
   kakaoId: string;
@@ -63,4 +64,7 @@ export class Users {
 
   @OneToMany(() => ChatUsers, (chatUser) => chatUser.User)
   ChatUser: ChatUsers[];
+
+  @OneToMany(() => ChatRecords, (chatRecord) => chatRecord.User)
+  ChatRecord: ChatRecords[];
 }

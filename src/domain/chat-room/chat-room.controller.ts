@@ -54,4 +54,12 @@ export class ChatRoomController {
     await this.chatRoomService.leaveChatRoom(body, user);
     return;
   }
+
+  @ApiOperation({ summary: '이전 채팅방 기록있는지 불러오기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Get('record')
+  async getChatRecord(@User() user): Promise<number> {
+    return await this.chatRoomService.getChatRecord(user);
+  }
 }
