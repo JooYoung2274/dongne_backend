@@ -15,5 +15,6 @@ import { ChatRecords } from '../entities/chatRecord';
   ],
   providers: [ChatRoomService, ChatRoomRepository],
   controllers: [ChatRoomController],
+  exports: [ChatRoomRepository],
 })
 export class ChatRoomModule {}

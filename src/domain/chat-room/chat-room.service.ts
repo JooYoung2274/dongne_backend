@@ -83,4 +83,16 @@ export class ChatRoomService {
     await this.chatRoomRepository.deleteChatUser(isChatUser.id);
     return;
   }
+
+  async getChatRecord(user): Promise<number> {
+    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+      user.id,
+    );
+
+    if (!isChatUser) {
+      throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
+    }
+
+    return isChatUser.ChatId;
+  }
 }

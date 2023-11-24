@@ -29,8 +29,8 @@ export class Users {
   @Column('varchar', { name: 'pushToken', nullable: true })
   pushToken: string;
 
-  @Column('varchar', { name: 'idToken', nullable: true })
-  idToken: string;
+  @Column('varchar', { name: 'googleId', nullable: true })
+  googleId: string;
 
   @Column('varchar', { name: 'kakaoId', nullable: true })
   kakaoId: string;

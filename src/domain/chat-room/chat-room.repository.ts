@@ -13,6 +13,7 @@ export class ChatRoomRepository {
     @InjectRepository(Chats) private chatRepository: Repository<Chats>,
     @InjectRepository(ChatUsers)
     private chatUserRepository: Repository<ChatUsers>,
+    @InjectRepository(ChatRecords)
     private chatRecordRepository: Repository<ChatRecords>,
   ) {}
 
@@ -76,5 +77,12 @@ export class ChatRoomRepository {
     newChatRecord.UserId = userId;
 
     await this.chatRecordRepository.save(newChatRecord);
+  }
+
+  async getChatRecord(chatId): Promise<ChatRecords[]> {
+    const result = await this.chatRecordRepository.find({
+      where: { ChatId: chatId },
+    });
+    return result;
   }
 }

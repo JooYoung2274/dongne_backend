@@ -90,15 +90,36 @@ export class EventsGateway
     console.log('leaveRoom', socket['dongneData']);
   }
 
+  @SubscribeMessage('reJoinRoom')
+  async handleReJoinRoom(
+    @MessageBody() data: { id: number; roomId: string },
+    @ConnectedSocket() socket: Socket,
+  ) {
+    // 방에 들어갈 때
+    socket['dongneData'].userId = data.id;
+    socket['dongneData'].roomId = data.roomId;
+
+    // 조인룸 시켜버림
+    socket.join(data.roomId);
+
+    // 이전 채팅 기록도 리턴해버림
+    const chatRecord = await this.chatRoomRepository.getChatRecord(
+      Number(data.roomId),
+    );
+
+    // 방에 들어갔다고 알려줌
+    socket.emit('reJoinRoom', { roomId: data.roomId, chatRecord: chatRecord });
+    console.log('reJoinRoom', socket['dongneData']);
+  }
   afterInit() {
     console.log('소켓서버 init');
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log('connected', socket['dongneData'].userId);
+    console.log('connected', socket['dongneData']);
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    console.log('disconnected', socket['dongneData'].userId);
+    console.log('disconnected', socket['dongneData']);
   }
 }
