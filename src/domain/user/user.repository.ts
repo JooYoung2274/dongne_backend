@@ -121,4 +121,8 @@ export class UserRepository {
   async deleteUserArea(userId: number, queryRunner?: QueryRunner) {
     await queryRunner.manager.delete(UserAreas, { UserId: userId });
   }
+
+  async deleteRefreshToken(id: number) {
+    await this.userRepository.update(id, { refreshToken: null });
+  }
 }

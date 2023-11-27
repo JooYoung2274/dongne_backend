@@ -21,7 +21,7 @@ import { setAddressDto } from './dto/request.setAddress.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation({ summary: '회원가입/로그인' })
+  @ApiOperation({ summary: '(안쓰는 api)_일반 회원가입' })
   @ApiBody({ type: loginDto })
   @Post('signup')
   async signup(@Body() body: loginDto) {
@@ -32,6 +32,13 @@ export class UserController {
   @Post('login')
   async login(@Body() body: loginDto) {
     return this.userService.login(body);
+  }
+
+  @ApiOperation({ summary: '로그아웃' })
+  @ApiBearerAuth('access-token')
+  @Post('logout')
+  async logout(@User() user): Promise<void> {
+    return this.userService.logout(user);
   }
 
   @ApiOperation({ summary: '내 지역 불러오기' })

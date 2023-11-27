@@ -67,6 +67,10 @@ export class UserService {
     return await this.createTokens(isUser.id);
   }
 
+  async logout(user): Promise<void> {
+    await this.userRepository.deleteRefreshToken(user.id);
+  }
+
   async signup(dto: loginDto): Promise<{
     accessToken: string;
     refreshToken: string;
