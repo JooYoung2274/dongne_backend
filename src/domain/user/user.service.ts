@@ -9,6 +9,7 @@ import { AxiosClass } from 'src/util/axios.class';
 import { AddressResponse } from 'src/util/kakaoMap.type';
 import { setAddressDto } from './dto/request.setAddress.dto';
 import { DataSource } from 'typeorm';
+import { refreshTokenDto } from './dto/request.refresh.dto';
 
 @Injectable()
 export class UserService {
@@ -69,6 +70,18 @@ export class UserService {
 
   async logout(user): Promise<void> {
     await this.userRepository.deleteRefreshToken(user.id);
+  }
+
+  async refresh(
+    body: refreshTokenDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const { refreshToken } = body;
+    const isUser =
+      await this.userRepository.findOneByRefreshToken(refreshToken);
+    if (!isUser) {
+      throw new BadRequestException('로그인이 필요합니다.');
+    }
+    return await this.createTokens(isUser.id);
   }
 
   async signup(dto: loginDto): Promise<{

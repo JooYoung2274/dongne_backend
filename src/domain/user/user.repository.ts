@@ -125,4 +125,11 @@ export class UserRepository {
   async deleteRefreshToken(id: number) {
     await this.userRepository.update(id, { refreshToken: null });
   }
+
+  async findOneByRefreshToken(refreshToken: string): Promise<Users> {
+    const result = await this.userRepository.findOne({
+      where: { refreshToken },
+    });
+    return result;
+  }
 }

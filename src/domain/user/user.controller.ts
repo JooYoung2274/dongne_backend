@@ -15,6 +15,7 @@ import { Areas } from '../entities/area';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/common/decorator/user.decorator';
 import { setAddressDto } from './dto/request.setAddress.dto';
+import { refreshTokenDto } from './dto/request.refresh.dto';
 
 @ApiTags('유저')
 @Controller('user')
@@ -30,8 +31,10 @@ export class UserController {
 
   @ApiOperation({ summary: '로그인' })
   @Post('login')
-  async login(@Body() body: loginDto) {
-    return this.userService.login(body);
+  async login(
+    @Body() body: loginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    return await this.userService.login(body);
   }
 
   @ApiOperation({ summary: '로그아웃' })
@@ -39,6 +42,14 @@ export class UserController {
   @Post('logout')
   async logout(@User() user): Promise<void> {
     return this.userService.logout(user);
+  }
+
+  @ApiOperation({ summary: '리프레시 토큰' })
+  @Post('refresh')
+  async refresh(
+    @Body() body: refreshTokenDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    return await this.userService.refresh(body);
   }
 
   @ApiOperation({ summary: '내 지역 불러오기' })
