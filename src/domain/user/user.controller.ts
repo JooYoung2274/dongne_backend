@@ -5,17 +5,27 @@ import {
   Param,
   Post,
   Put,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { loginDto } from './dto/request.login.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { checkAddressDto } from './dto/request.checkAddress.dto';
 import { Areas } from '../entities/area';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/common/decorator/user.decorator';
 import { setAddressDto } from './dto/request.setAddress.dto';
 import { refreshTokenDto } from './dto/request.refresh.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 @ApiTags('유저')
 @Controller('user')
@@ -39,9 +49,12 @@ export class UserController {
 
   @ApiOperation({ summary: '로그아웃' })
   @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
   @Post('logout')
   async logout(@User() user): Promise<void> {
-    return this.userService.logout(user);
+    console.log(user);
+    // return this.userService.logout(user);
+    return;
   }
 
   @ApiOperation({ summary: '리프레시 토큰' })
@@ -90,5 +103,43 @@ export class UserController {
     latitude: string;
   }> {
     return await this.userService.getMarketAddress(address);
+  }
+
+  @ApiOperation({ summary: '프로필 사진 업로드' })
+  @ApiBearerAuth('access-token')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseGuards(AuthGuard('jwt'))
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: 'dist/uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `/${randomName}.png`);
+        },
+      }),
+    }),
+  )
+  async uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @User() user: any,
+  ) {
+    await this.userService.editProfileImage(file, user);
+    return;
   }
 }

@@ -62,10 +62,20 @@ export class UserService {
         );
       }
       const newUser = await this.userRepository.createUser(dto);
-      return await this.createTokens(newUser.id);
+      const result = await this.createTokens(newUser.id);
+      await this.userRepository.updateRefreshToken(
+        result.refreshToken,
+        newUser.id,
+      );
+      return result;
     }
 
-    return await this.createTokens(isUser.id);
+    const result = await this.createTokens(isUser.id);
+    await this.userRepository.updateRefreshToken(
+      result.refreshToken,
+      isUser.id,
+    );
+    return result;
   }
 
   async logout(user): Promise<void> {
@@ -76,12 +86,18 @@ export class UserService {
     body: refreshTokenDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const { refreshToken } = body;
+
     const isUser =
       await this.userRepository.findOneByRefreshToken(refreshToken);
     if (!isUser) {
       throw new BadRequestException('로그인이 필요합니다.');
     }
-    return await this.createTokens(isUser.id);
+    const result = await this.createTokens(isUser.id);
+    await this.userRepository.updateRefreshToken(
+      result.refreshToken,
+      isUser.id,
+    );
+    return result;
   }
 
   async signup(dto: loginDto): Promise<{
@@ -96,7 +112,12 @@ export class UserService {
     dto.password = await bcrypt.hash(password, 12);
 
     const newUser = await this.userRepository.createUser(dto);
-    return await this.createTokens(newUser.id);
+    const result = await this.createTokens(newUser.id);
+    await this.userRepository.updateRefreshToken(
+      result.refreshToken,
+      newUser.id,
+    );
+    return result;
   }
 
   async nicknameDuplicationCheck(nickname: string): Promise<void> {
@@ -201,12 +222,21 @@ export class UserService {
     if (!isKakaoMapData.documents.length) {
       throw new BadRequestException('주소를 찾을 수 없습니다.');
     }
-    console.log(isKakaoMapData.documents[0]);
     const addressName = isKakaoMapData?.documents[0]?.address_name;
     const placeName = isKakaoMapData?.documents[0]?.place_name;
     const longitude = isKakaoMapData?.documents[0]?.x;
     const latitude = isKakaoMapData?.documents[0]?.y;
 
     return { placeName, addressName, longitude, latitude };
+  }
+
+  async editProfileImage(file, user) {
+    const isUser = await this.userRepository.findOneById(user.id);
+    if (!isUser) {
+      throw new BadRequestException('유저를 찾을 수 없습니다.');
+    }
+    const profileImage = file.filename;
+    await this.userRepository.updateProfileImage(profileImage, user.id);
+    return;
   }
 }

@@ -132,4 +132,16 @@ export class UserRepository {
     });
     return result;
   }
+
+  async updateProfileImage(profileImage, id) {
+    const isUser = await this.userRepository.findOne({ where: { id } });
+    isUser.profileImage = 'dist/uploads' + profileImage;
+    await this.userRepository.save(isUser);
+  }
+
+  async updateRefreshToken(refreshToken: string, userid: number) {
+    const isUser = await this.userRepository.findOne({ where: { id: userid } });
+    isUser.refreshToken = refreshToken;
+    await this.userRepository.save(isUser);
+  }
 }
