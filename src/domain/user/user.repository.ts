@@ -121,4 +121,27 @@ export class UserRepository {
   async deleteUserArea(userId: number, queryRunner?: QueryRunner) {
     await queryRunner.manager.delete(UserAreas, { UserId: userId });
   }
+
+  async deleteRefreshToken(id: number) {
+    await this.userRepository.update(id, { refreshToken: null });
+  }
+
+  async findOneByRefreshToken(refreshToken: string): Promise<Users> {
+    const result = await this.userRepository.findOne({
+      where: { refreshToken },
+    });
+    return result;
+  }
+
+  async updateProfileImage(profileImage, id) {
+    const isUser = await this.userRepository.findOne({ where: { id } });
+    isUser.profileImage = 'dist/uploads' + profileImage;
+    await this.userRepository.save(isUser);
+  }
+
+  async updateRefreshToken(refreshToken: string, userid: number) {
+    const isUser = await this.userRepository.findOne({ where: { id: userid } });
+    isUser.refreshToken = refreshToken;
+    await this.userRepository.save(isUser);
+  }
 }

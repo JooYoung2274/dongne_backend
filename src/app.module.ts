@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { UserModule } from './domain/user/user.module';
 import { ChatRoomModule } from './domain/chat-room/chat-room.module';
 import { EventsModule } from './domain/chat/chat.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -14,6 +15,9 @@ import { EventsModule } from './domain/chat/chat.module';
     UserModule,
     ChatRoomModule,
     EventsModule,
+    ServeStaticModule.forRoot({
+      rootPath: './',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
