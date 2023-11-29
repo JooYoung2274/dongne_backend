@@ -9,9 +9,9 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle('Dongne API')
     .setDescription(
-      'Dongne API Document 입니다. JWT 토큰은 임의로 발급받은 후 우측에 있는 Authorize 에 등록해주세요.',
+      '- Dongne API Document 입니다. JWT 토큰은 가입 후 리턴된 accessToken을 좌측에 있는 Authorize에 등록해주세요.',
     )
-    .setVersion('1.0')
+    .setVersion('0.0.1')
 
     .addBearerAuth(
       {
