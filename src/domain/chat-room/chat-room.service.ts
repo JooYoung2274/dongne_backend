@@ -5,6 +5,7 @@ import { Chats } from '../entities/chat';
 import { UserRepository } from '../user/user.repository';
 import { joinChatRoomDto } from './dto/request.joinChatRoom.dto';
 import { ChatUsers } from '../entities/chatUser';
+import { changeChatRoomStatusDto } from './dto/request.changeChatRoomStatus.dto';
 
 @Injectable()
 export class ChatRoomService {
@@ -25,7 +26,7 @@ export class ChatRoomService {
 
     const newChatRoom = await this.chatRoomRepository.createChatRoom(body);
 
-    await this.chatRoomRepository.createChatUser(newChatRoom.id, user.id);
+    await this.chatRoomRepository.createChatUser(newChatRoom.id, user.id, true);
     return newChatRoom;
   }
 
@@ -52,9 +53,11 @@ export class ChatRoomService {
       `${isUser.nickname}님이 입장하셨습니다.`,
       user.id,
     );
+
     return await this.chatRoomRepository.createChatUser(
       body.ChatRoomId,
       user.id,
+      false,
     );
   }
 
@@ -81,6 +84,11 @@ export class ChatRoomService {
     );
 
     await this.chatRoomRepository.deleteChatUser(isChatUser.id);
+
+    if (isChatUser.isHost) {
+      await this.chatRoomRepository.deleteChatRoom(body.ChatRoomId);
+    }
+
     return;
   }
 
@@ -94,5 +102,41 @@ export class ChatRoomService {
     }
 
     return isChatUser.ChatId;
+  }
+
+  async changeChatRoomStatus(body: changeChatRoomStatusDto, user) {
+    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+      user.id,
+    );
+
+    if (!isChatUser) {
+      throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
+    }
+
+    if (!isChatUser.isHost) {
+      throw new BadRequestException('방장만 변경할 수 있습니다');
+    }
+
+    // 현재 룸 정보 찾아서
+    const isChatRoom = await this.chatRoomRepository.findOneById(
+      isChatUser.ChatId,
+    );
+
+    // 현재 룸의 상태가 변경하려는 상태와 같으면 에러
+    if (isChatRoom.StatusId === body.statusId) {
+      throw new BadRequestException('이미 변경하려는 상태입니다');
+    }
+
+    // 현재 룸의 상태가 두단계 이상 차이나면 에러
+    if (isChatRoom.StatusId - body.statusId > 1) {
+      throw new BadRequestException('두 단계 이상 변경입니다. 확인해주세요!');
+    }
+
+    await this.chatRoomRepository.updateChatRoomStatus(
+      isChatUser.ChatId,
+      body.statusId,
+    );
+
+    return;
   }
 }

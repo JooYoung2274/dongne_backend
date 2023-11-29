@@ -41,11 +41,15 @@ export class ChatRoomRepository {
     return result;
   }
 
-  async createChatUser(chatId: number, userId: number): Promise<ChatUsers> {
+  async createChatUser(
+    chatId: number,
+    userId: number,
+    isHost: boolean,
+  ): Promise<ChatUsers> {
     const newChatUser = this.chatUserRepository.create();
     newChatUser.ChatId = chatId;
     newChatUser.UserId = userId;
-
+    newChatUser.isHost = isHost;
     await this.chatUserRepository.save(newChatUser);
     return newChatUser;
   }
@@ -84,5 +88,22 @@ export class ChatRoomRepository {
       where: { ChatId: chatId },
     });
     return result;
+  }
+
+  async deleteChatRoom(chatId) {
+    await this.chatRepository.delete(chatId);
+  }
+
+  async findOneById(id: number): Promise<Chats> {
+    const result = await this.chatRepository.findOne({
+      where: { id },
+    });
+    return result;
+  }
+
+  async updateChatRoomStatus(id: number, statusId: number) {
+    const isChatRoom = await this.chatRepository.findOne({ where: { id } });
+    isChatRoom.StatusId = statusId;
+    await this.chatRepository.save(isChatRoom);
   }
 }

@@ -14,6 +14,9 @@ export class ChatUsers {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
+  @Column('boolean', { name: 'isHost' })
+  isHost: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
