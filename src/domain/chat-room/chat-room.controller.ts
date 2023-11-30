@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ChatRoomService } from './chat-room.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { createChatRoomDto } from './dto/request.createChatRoom.dto';
@@ -7,6 +15,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Chats } from '../entities/chat';
 import { joinChatRoomDto } from './dto/request.joinChatRoom.dto';
 import { ChatUsers } from '../entities/chatUser';
+import { changeChatRoomStatusDto } from './dto/request.changeChatRoomStatus.dto';
+import { paymentDto } from './dto/request.changePaymentStatus.dto';
 
 @ApiTags('채팅방')
 @Controller('chat-room')
@@ -62,4 +72,33 @@ export class ChatRoomController {
   async getChatRecord(@User() user): Promise<number> {
     return await this.chatRoomService.getChatRecord(user);
   }
+
+  @ApiOperation({ summary: '채팅방 상태 변경' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Put('status/:chatRoomId')
+  async changeChatRoomStatus(
+    @Param('chatRoomId') chatRoomdId: number,
+    @Body() body: changeChatRoomStatusDto,
+    @User() user,
+  ): Promise<void> {
+    await this.chatRoomService.changeChatRoomStatus(body, chatRoomdId, user);
+    return;
+  }
+
+  @ApiOperation({ summary: '입금 완료로 상태 변경하기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Put('payment/:chatRoomId')
+  async changePaymentStatus(
+    @Body() body: paymentDto,
+    @Param('chatRoomId') chatRoomId: number,
+    @User() user,
+  ): Promise<void> {
+    await this.chatRoomService.changePaymentStatus(body, chatRoomId, user);
+    return;
+  }
+
+  // @ApiOperation({ summary: '내가 주문한 메뉴 금액 입력하기' })
+  // @ApiOperation({ summary: '내가 입금해야할 금액 확인하기' })
 }

@@ -6,6 +6,7 @@ import { createChatRoomDto } from './dto/request.createChatRoom.dto';
 import { CATEGORY_PROFILE } from 'src/constant/category-profile';
 import { ChatUsers } from '../entities/chatUser';
 import { ChatRecords } from '../entities/chatRecord';
+import { paymentDto } from './dto/request.changePaymentStatus.dto';
 
 @Injectable()
 export class ChatRoomRepository {
@@ -29,7 +30,7 @@ export class ChatRoomRepository {
     newChatRoom.max = body.max;
     newChatRoom.dueDate = new Date(body.dueDate);
     newChatRoom.AreaId = body.AreaId;
-
+    newChatRoom.isAllPaid = false;
     await this.chatRepository.save(newChatRoom);
     return newChatRoom;
   }
@@ -41,11 +42,16 @@ export class ChatRoomRepository {
     return result;
   }
 
-  async createChatUser(chatId: number, userId: number): Promise<ChatUsers> {
+  async createChatUser(
+    chatId: number,
+    userId: number,
+    isHost: boolean,
+  ): Promise<ChatUsers> {
     const newChatUser = this.chatUserRepository.create();
     newChatUser.ChatId = chatId;
     newChatUser.UserId = userId;
-
+    newChatUser.isHost = isHost;
+    newChatUser.isPaid = false;
     await this.chatUserRepository.save(newChatUser);
     return newChatUser;
   }
@@ -82,6 +88,47 @@ export class ChatRoomRepository {
   async getChatRecord(chatId): Promise<ChatRecords[]> {
     const result = await this.chatRecordRepository.find({
       where: { ChatId: chatId },
+    });
+    return result;
+  }
+
+  async deleteChatRoom(chatId) {
+    await this.chatRepository.delete(chatId);
+  }
+
+  async findOneById(id: number): Promise<Chats> {
+    const result = await this.chatRepository.findOne({
+      where: { id },
+    });
+    return result;
+  }
+
+  async updateChatRoomStatus(id: number, statusId: number) {
+    const isChatRoom = await this.chatRepository.findOne({ where: { id } });
+    isChatRoom.StatusId = statusId;
+    await this.chatRepository.save(isChatRoom);
+  }
+
+  async updatePaymentStatus(body: paymentDto, id: number) {
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { ChatId: id },
+    });
+    isChatUser.isPaid = true;
+    isChatUser.amount = body.amount;
+    isChatUser.paidAt = new Date();
+    await this.chatUserRepository.save(isChatUser);
+  }
+
+  async findChatUserList(chatRoomId: number) {
+    const result = await this.chatUserRepository.find({
+      where: { ChatId: chatRoomId },
+    });
+    return result;
+  }
+
+  async findChatUserisPaidList(chatRoomId: number) {
+    const result = await this.chatUserRepository.find({
+      where: { ChatId: chatRoomId, isPaid: true },
     });
     return result;
   }

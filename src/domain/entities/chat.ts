@@ -38,6 +38,9 @@ export class Chats {
   @Column('int', { name: 'max' })
   max: number;
 
+  @Column('boolean', { name: 'isAllPaid', nullable: true })
+  isAllPaid: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
