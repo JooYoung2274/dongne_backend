@@ -14,8 +14,17 @@ export class ChatUsers {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
-  @Column('boolean', { name: 'isHost' })
+  @Column('boolean', { name: 'isHost', nullable: true })
   isHost: boolean;
+
+  @Column('boolean', { name: 'isPaid', nullable: true })
+  isPaid: boolean;
+
+  @Column('int', { name: 'amount', nullable: true })
+  amount: number;
+
+  @Column('date', { name: 'paidAt', nullable: true })
+  paidAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;

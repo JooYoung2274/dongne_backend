@@ -6,6 +6,7 @@ import { UserRepository } from '../user/user.repository';
 import { joinChatRoomDto } from './dto/request.joinChatRoom.dto';
 import { ChatUsers } from '../entities/chatUser';
 import { changeChatRoomStatusDto } from './dto/request.changeChatRoomStatus.dto';
+import { paymentDto } from './dto/request.changePaymentStatus.dto';
 
 @Injectable()
 export class ChatRoomService {
@@ -104,7 +105,11 @@ export class ChatRoomService {
     return isChatUser.ChatId;
   }
 
-  async changeChatRoomStatus(body: changeChatRoomStatusDto, user) {
+  async changeChatRoomStatus(
+    body: changeChatRoomStatusDto,
+    chatRoomId: number,
+    user,
+  ) {
     const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
       user.id,
     );
@@ -113,8 +118,23 @@ export class ChatRoomService {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
     }
 
+    if (isChatUser.ChatId !== chatRoomId) {
+      throw new BadRequestException('잘못된 접근입니다');
+    }
+
     if (!isChatUser.isHost) {
       throw new BadRequestException('방장만 변경할 수 있습니다');
+    }
+
+    const isChatUserList =
+      await this.chatRoomRepository.findChatUserList(chatRoomId);
+
+    const paidCheck = isChatUserList.map((chatUser) => {
+      chatUser.isPaid = false;
+    });
+
+    if (paidCheck.length) {
+      throw new BadRequestException('아직 입금하지 않은 인원이 있습니다');
     }
 
     // 현재 룸 정보 찾아서
@@ -136,6 +156,32 @@ export class ChatRoomService {
       isChatUser.ChatId,
       body.statusId,
     );
+
+    return;
+  }
+
+  async changePaymentStatus(body: paymentDto, id: number, user) {
+    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+      user.id,
+    );
+
+    if (!isChatUser) {
+      throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
+    }
+
+    if (!body.amount) {
+      throw new BadRequestException('입금한 금액을 입력해주세요');
+    }
+
+    await this.chatRoomRepository.updatePaymentStatus(body, id);
+
+    const isChatUserisPaidList =
+      await this.chatRoomRepository.findChatUserisPaidList(id);
+    const isChatRoom = await this.chatRoomRepository.findOneById(id);
+
+    if (isChatUserisPaidList.length === isChatRoom.max) {
+      await this.chatRoomRepository.updateChatRoomStatus(id, 5);
+    }
 
     return;
   }
