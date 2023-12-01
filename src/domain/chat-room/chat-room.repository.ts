@@ -28,6 +28,7 @@ export class ChatRoomRepository {
     newChatRoom.latitude = body.latitude;
     newChatRoom.restaurantName = body.restaurantName;
     newChatRoom.max = body.max;
+    newChatRoom.deliveryFee = body.deliveryFee;
     newChatRoom.dueDate = new Date(body.dueDate);
     newChatRoom.AreaId = body.AreaId;
     newChatRoom.isAllPaid = false;

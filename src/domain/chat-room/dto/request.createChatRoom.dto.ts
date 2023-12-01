@@ -31,6 +31,15 @@ export class createChatRoomDto {
 
   @IsNumber()
   @ApiProperty({
+    description: '배달비',
+    required: true,
+    nullable: false,
+    example: 5000,
+  })
+  deliveryFee: number;
+
+  @IsNumber()
+  @ApiProperty({
     description: '지역Id',
     required: true,
     nullable: false,

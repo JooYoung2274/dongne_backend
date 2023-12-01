@@ -100,5 +100,5 @@ export class ChatRoomController {
   }
 
   // @ApiOperation({ summary: '내가 주문한 메뉴 금액 입력하기' })
-  // @ApiOperation({ summary: '내가 입금해야할 금액 확인하기' })
+  // @ApiOperation({ summary: '내가 입금한 메뉴 금액 불러오기' })
 }
