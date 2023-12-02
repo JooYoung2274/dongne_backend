@@ -186,11 +186,10 @@ export class UserService {
   }
 
   async setAddress(body: setAddressDto, user): Promise<void> {
+    const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
-
-    const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
 
     try {
       if (isUserArea) {

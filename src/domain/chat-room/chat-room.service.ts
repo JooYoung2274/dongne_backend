@@ -17,6 +17,12 @@ export class ChatRoomService {
   ) {}
 
   async createChatRoom(body: createChatRoomDto, user): Promise<Chats> {
+    const { max, deliveryFee } = body;
+
+    if (max % deliveryFee) {
+      throw new BadRequestException('배달비는 인원수로 나누어 떨어져야 합니다');
+    }
+
     const isChatRoom = await this.chatRoomRepository.findChatUserByUserId(
       user.id,
     );
