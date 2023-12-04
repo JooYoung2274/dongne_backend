@@ -38,7 +38,7 @@ export class Chats {
   @Column('int', { name: 'max' })
   max: number;
 
-  @Column('int', { name: 'deliveryFee' })
+  @Column('int', { name: 'deliveryFee', nullable: true })
   deliveryFee: number;
 
   @Column('boolean', { name: 'isAllPaid', nullable: true })
