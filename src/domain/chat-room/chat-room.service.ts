@@ -19,7 +19,7 @@ export class ChatRoomService {
   async createChatRoom(body: createChatRoomDto, user): Promise<Chats> {
     const { max, deliveryFee } = body;
 
-    if (max % deliveryFee) {
+    if (deliveryFee % max) {
       throw new BadRequestException('배달비는 인원수로 나누어 떨어져야 합니다');
     }
 
@@ -33,7 +33,12 @@ export class ChatRoomService {
 
     const newChatRoom = await this.chatRoomRepository.createChatRoom(body);
 
-    await this.chatRoomRepository.createChatUser(newChatRoom.id, user.id, true);
+    await this.chatRoomRepository.createChatUser(
+      newChatRoom.id,
+      user.id,
+      true,
+      true,
+    );
     return newChatRoom;
   }
 
@@ -64,6 +69,7 @@ export class ChatRoomService {
     return await this.chatRoomRepository.createChatUser(
       body.ChatRoomId,
       user.id,
+      false,
       false,
     );
   }
@@ -124,23 +130,12 @@ export class ChatRoomService {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
     }
 
-    if (isChatUser.ChatId !== chatRoomId) {
+    if (isChatUser.ChatId !== +chatRoomId) {
       throw new BadRequestException('잘못된 접근입니다');
     }
 
     if (!isChatUser.isHost) {
       throw new BadRequestException('방장만 변경할 수 있습니다');
-    }
-
-    const isChatUserList =
-      await this.chatRoomRepository.findChatUserList(chatRoomId);
-
-    const paidCheck = isChatUserList.map((chatUser) => {
-      chatUser.isPaid = false;
-    });
-
-    if (paidCheck.length) {
-      throw new BadRequestException('아직 입금하지 않은 인원이 있습니다');
     }
 
     // 현재 룸 정보 찾아서
@@ -156,6 +151,32 @@ export class ChatRoomService {
     // 현재 룸의 상태가 두단계 이상 차이나면 에러
     if (isChatRoom.StatusId - body.statusId > 1) {
       throw new BadRequestException('두 단계 이상 변경입니다. 확인해주세요!');
+    }
+
+    if (body.statusId === 3) {
+      const isChatUserList =
+        await this.chatRoomRepository.findChatUserList(chatRoomId);
+
+      const paidCheck = isChatUserList.map((chatUser) => {
+        chatUser.isPaid = false;
+      });
+
+      if (paidCheck.length) {
+        throw new BadRequestException('아직 입금하지 않은 인원이 있습니다');
+      }
+    }
+
+    if (body.statusId === 2) {
+      // chatUser 인원 찾고 max랑 비교해서 다르면 chatRoom의 max 변경
+      const isChatUserList =
+        await this.chatRoomRepository.findChatUserList(chatRoomId);
+
+      if (isChatUserList.length < isChatRoom.max) {
+        await this.chatRoomRepository.updateChatRoomMax(
+          chatRoomId,
+          isChatUserList.length,
+        );
+      }
     }
 
     await this.chatRoomRepository.updateChatRoomStatus(

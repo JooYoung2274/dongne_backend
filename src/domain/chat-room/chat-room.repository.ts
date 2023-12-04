@@ -47,12 +47,13 @@ export class ChatRoomRepository {
     chatId: number,
     userId: number,
     isHost: boolean,
+    isPaid: boolean,
   ): Promise<ChatUsers> {
     const newChatUser = this.chatUserRepository.create();
     newChatUser.ChatId = chatId;
     newChatUser.UserId = userId;
     newChatUser.isHost = isHost;
-    newChatUser.isPaid = false;
+    newChatUser.isPaid = isPaid;
     await this.chatUserRepository.save(newChatUser);
     return newChatUser;
   }
@@ -132,5 +133,13 @@ export class ChatRoomRepository {
       where: { ChatId: chatRoomId, isPaid: true },
     });
     return result;
+  }
+
+  async updateChatRoomMax(chatRoomId: number, newMax: number) {
+    const isChatRoom = await this.chatRepository.findOne({
+      where: { id: chatRoomId },
+    });
+    isChatRoom.max = newMax;
+    await this.chatRepository.save(isChatRoom);
   }
 }
