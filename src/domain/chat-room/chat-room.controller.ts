@@ -38,7 +38,7 @@ export class ChatRoomController {
   @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard('jwt'))
   @Get('list')
-  async getChatRoomList(@User() user): Promise<Chats[]> {
+  async getChatRoomList(@User() user): Promise<any> {
     return this.chatRoomService.getChatRoomList(user);
   }
 
@@ -98,6 +98,8 @@ export class ChatRoomController {
     await this.chatRoomService.changePaymentStatus(body, chatRoomId, user);
     return;
   }
+
+  // @ApiOperation()
 
   // @ApiOperation({ summary: '내가 주문한 메뉴 금액 입력하기' })
   // @ApiOperation({ summary: '내가 입금한 메뉴 금액 불러오기' })

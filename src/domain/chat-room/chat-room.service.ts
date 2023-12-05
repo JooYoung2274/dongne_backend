@@ -42,7 +42,7 @@ export class ChatRoomService {
     return newChatRoom;
   }
 
-  async getChatRoomList(user): Promise<Chats[]> {
+  async getChatRoomList(user): Promise<any> {
     const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
 
     return await this.chatRoomRepository.getChatRoomList(isUserArea.AreaId);
@@ -148,20 +148,16 @@ export class ChatRoomService {
       throw new BadRequestException('이미 변경하려는 상태입니다');
     }
 
-    // 현재 룸의 상태가 두단계 이상 차이나면 에러
+    // 변경하려는 룸의 상태가 두단계 이상 차이나면 에러
     if (isChatRoom.StatusId - body.statusId > 1) {
       throw new BadRequestException('두 단계 이상 변경입니다. 확인해주세요!');
     }
 
     if (body.statusId === 3) {
       const isChatUserList =
-        await this.chatRoomRepository.findChatUserList(chatRoomId);
+        await this.chatRoomRepository.findChatUserisPaidList(chatRoomId, false);
 
-      const paidCheck = isChatUserList.map((chatUser) => {
-        chatUser.isPaid = false;
-      });
-
-      if (paidCheck.length) {
+      if (isChatUserList.length) {
         throw new BadRequestException('아직 입금하지 않은 인원이 있습니다');
       }
     }
@@ -196,14 +192,10 @@ export class ChatRoomService {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
     }
 
-    if (!body.amount) {
-      throw new BadRequestException('입금한 금액을 입력해주세요');
-    }
-
     await this.chatRoomRepository.updatePaymentStatus(body, id);
 
     const isChatUserisPaidList =
-      await this.chatRoomRepository.findChatUserisPaidList(id);
+      await this.chatRoomRepository.findChatUserisPaidList(id, true);
     const isChatRoom = await this.chatRoomRepository.findOneById(id);
 
     if (isChatUserisPaidList.length === isChatRoom.max) {
