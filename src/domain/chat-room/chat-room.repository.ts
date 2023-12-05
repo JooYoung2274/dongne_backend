@@ -58,14 +58,34 @@ export class ChatRoomRepository {
     return newChatUser;
   }
 
-  async getChatRoomList(AreaId: number): Promise<Chats[]> {
-    const result = await this.chatRepository
+  async getChatRoomList(AreaId: number): Promise<any> {
+    const data = await this.chatRepository
       .createQueryBuilder('chat')
       .leftJoin('chat.ChatUser', 'chatUser')
       .leftJoin('chatUser.User', 'user')
       .leftJoin('user.UserArea', 'userArea')
       .where('userArea.AreaId = :AreaId', { AreaId })
-      .getMany();
+      .addSelect('COUNT(chatUser.ChatId)', 'count')
+      .groupBy('chat.id')
+      .getRawMany();
+
+    const result = data.map((chat) => ({
+      title: chat.chat_title,
+      count: chat.count,
+      id: chat.chat_id,
+      orderLink: chat.chat_orderLink,
+      logitude: chat.chat_longitude,
+      latitude: chat.chat_latitude,
+      restaurantName: chat.chat_restaurantName,
+      categoryProfile: chat.chat_categoryProfile,
+      max: chat.chat_max,
+      deliveryFee: chat.chat_deliveryFee,
+      isAllPaid: chat.chat_isAllPaid,
+      createdAt: chat.chat_createdAt,
+      dueDate: chat.chat_dueDate,
+      StatusId: chat.chat_StatusId,
+      AreaId: chat.chat_AreaId,
+    }));
 
     return result;
   }
@@ -128,9 +148,9 @@ export class ChatRoomRepository {
     return result;
   }
 
-  async findChatUserisPaidList(chatRoomId: number) {
+  async findChatUserisPaidList(chatRoomId: number, isPaid: boolean) {
     const result = await this.chatUserRepository.find({
-      where: { ChatId: chatRoomId, isPaid: true },
+      where: { ChatId: chatRoomId, isPaid: isPaid },
     });
     return result;
   }
