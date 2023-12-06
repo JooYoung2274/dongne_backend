@@ -187,6 +187,18 @@ export class UserService {
 
   async setAddress(body: setAddressDto, user): Promise<void> {
     const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
+
+    // 만약 참여하고 있는 채팅이 있다면 주소 변경 불가
+    // 근데 여기서 chatRoomModule을 import하면 순환참조가.....
+    // 귀찮아도 area module 따로 만들고, chatRoom이랑 chatUser도 분리하는게 좋을거 같은데 일단
+    // 그냥 여기다가도 chatUser entity를 import해서 쓰자 일단은
+
+    const isChatUser = await this.userRepository.findChatUserByUserId(user.id);
+
+    if (isChatUser) {
+      throw new BadRequestException('이미 참여중인 채팅방이 있습니다.');
+    }
+
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

@@ -10,6 +10,7 @@ import { GoogleStrategy } from './passport/google.strategy';
 import { UserAreas } from '../entities/userArea';
 import { Areas } from '../entities/area';
 import { AxiosClass } from 'src/util/axios.class';
+import { ChatUsers } from '../entities/chatUser';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AxiosClass } from 'src/util/axios.class';
         signOptions: { expiresIn: '7d' },
       }),
     }),
-    TypeOrmModule.forFeature([Users, UserAreas, Areas]),
+    TypeOrmModule.forFeature([Users, UserAreas, Areas, ChatUsers]),
   ],
   providers: [
     UserService,
