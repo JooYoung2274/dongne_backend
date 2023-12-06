@@ -7,12 +7,15 @@ import { UserAreas } from '../entities/userArea';
 import { checkAddressDto } from './dto/request.checkAddress.dto';
 import { Areas } from '../entities/area';
 import { setAddressDto } from './dto/request.setAddress.dto';
+import { ChatUsers } from '../entities/chatUser';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectRepository(Users) private userRepository: Repository<Users>,
     @InjectRepository(Areas) private areaRepository: Repository<Areas>,
+    @InjectRepository(ChatUsers)
+    private chatUserRepository: Repository<ChatUsers>,
     @InjectRepository(UserAreas)
     private userAreaRepository: Repository<UserAreas>,
   ) {}
@@ -143,5 +146,12 @@ export class UserRepository {
     const isUser = await this.userRepository.findOne({ where: { id: userid } });
     isUser.refreshToken = refreshToken;
     await this.userRepository.save(isUser);
+  }
+
+  async findChatUserByUserId(userId: number): Promise<ChatUsers> {
+    const result = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
+    return result;
   }
 }
