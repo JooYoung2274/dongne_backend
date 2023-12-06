@@ -10,6 +10,7 @@ import { AddressResponse } from 'src/util/kakaoMap.type';
 import { setAddressDto } from './dto/request.setAddress.dto';
 import { DataSource } from 'typeorm';
 import { refreshTokenDto } from './dto/request.refresh.dto';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class UserService {
@@ -185,6 +186,7 @@ export class UserService {
     return isArea;
   }
 
+  @Transactional()
   async setAddress(body: setAddressDto, user): Promise<void> {
     const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
 
@@ -199,23 +201,12 @@ export class UserService {
       throw new BadRequestException('이미 참여중인 채팅방이 있습니다.');
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-
-    try {
-      if (isUserArea) {
-        await this.userRepository.deleteUserArea(user.id, queryRunner);
-      }
-      await this.userRepository.createUserArea(body, user.id, queryRunner);
-
-      await queryRunner.commitTransaction();
-      return;
-    } catch (error) {
-      throw new BadRequestException('주소 설정에 실패했습니다.');
-    } finally {
-      await queryRunner.release();
+    if (isUserArea) {
+      await this.userRepository.deleteUserArea(user.id);
     }
+
+    await this.userRepository.createUserArea(body, user.id);
+    return;
   }
 
   async getMarketAddress(address: string): Promise<{

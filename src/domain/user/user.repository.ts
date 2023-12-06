@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from '../entities/user';
-import { QueryRunner, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { loginDto } from './dto/request.login.dto';
 import { UserAreas } from '../entities/userArea';
 import { checkAddressDto } from './dto/request.checkAddress.dto';
@@ -101,13 +101,12 @@ export class UserRepository {
   async createUserArea(
     body: setAddressDto,
     userId: number,
-    queryRunner?: QueryRunner,
   ): Promise<UserAreas> {
     const { areaId } = body;
-    const newUserArea = queryRunner.manager.create(UserAreas);
+    const newUserArea = this.userAreaRepository.create();
     newUserArea.AreaId = areaId;
     newUserArea.UserId = userId;
-    await queryRunner.manager.save(newUserArea);
+    await this.userAreaRepository.save(newUserArea);
     return newUserArea;
   }
 
@@ -121,8 +120,8 @@ export class UserRepository {
     return result;
   }
 
-  async deleteUserArea(userId: number, queryRunner?: QueryRunner) {
-    await queryRunner.manager.delete(UserAreas, { UserId: userId });
+  async deleteUserArea(userId: number) {
+    return await this.userAreaRepository.delete({ UserId: userId });
   }
 
   async deleteRefreshToken(id: number) {

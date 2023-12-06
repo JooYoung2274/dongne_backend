@@ -8,6 +8,8 @@ import { ChatUsers } from 'src/domain/entities/chatUser';
 import { Statuses } from 'src/domain/entities/status';
 import { Users } from 'src/domain/entities/user';
 import { UserAreas } from 'src/domain/entities/userArea';
+import { DataSource } from 'typeorm';
+import { addTransactionalDataSource } from 'typeorm-transactional';
 
 const databaseModule = TypeOrmModule.forRootAsync({
   inject: [ConfigService],
@@ -33,6 +35,16 @@ const databaseModule = TypeOrmModule.forRootAsync({
       synchronize: true,
       logging: true,
     };
+  },
+  dataSourceFactory: async (options) => {
+    if (!options) {
+      throw new Error('Invalid options passed');
+    }
+
+    return addTransactionalDataSource({
+      name: 'default',
+      dataSource: new DataSource(options),
+    });
   },
 });
 
