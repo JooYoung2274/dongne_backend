@@ -7,6 +7,7 @@ import { joinChatRoomDto } from './dto/request.joinChatRoom.dto';
 import { ChatUsers } from '../entities/chatUser';
 import { changeChatRoomStatusDto } from './dto/request.changeChatRoomStatus.dto';
 import { paymentDto } from './dto/request.changePaymentStatus.dto';
+import { Transactional } from 'typeorm-transactional';
 
 @Injectable()
 export class ChatRoomService {
@@ -16,6 +17,7 @@ export class ChatRoomService {
     private readonly userRepository: UserRepository,
   ) {}
 
+  @Transactional()
   async createChatRoom(body: createChatRoomDto, user): Promise<Chats> {
     const { max, deliveryFee } = body;
 
@@ -39,6 +41,7 @@ export class ChatRoomService {
       true,
       true,
     );
+
     return newChatRoom;
   }
 
@@ -48,6 +51,7 @@ export class ChatRoomService {
     return await this.chatRoomRepository.getChatRoomList(isUserArea.AreaId);
   }
 
+  @Transactional()
   async joinChatRoom(body: joinChatRoomDto, user): Promise<ChatUsers> {
     const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
       user.id,
@@ -66,14 +70,17 @@ export class ChatRoomService {
       user.id,
     );
 
-    return await this.chatRoomRepository.createChatUser(
+    const result = await this.chatRoomRepository.createChatUser(
       body.ChatRoomId,
       user.id,
       false,
       false,
     );
+
+    return result;
   }
 
+  @Transactional()
   async leaveChatRoom(body: joinChatRoomDto, user): Promise<void> {
     const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
       user.id,
@@ -117,6 +124,7 @@ export class ChatRoomService {
     return isChatUser.ChatId;
   }
 
+  @Transactional()
   async changeChatRoomStatus(
     body: changeChatRoomStatusDto,
     chatRoomId: number,
@@ -183,6 +191,7 @@ export class ChatRoomService {
     return;
   }
 
+  @Transactional()
   async changePaymentStatus(body: paymentDto, id: number, user) {
     const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
       user.id,

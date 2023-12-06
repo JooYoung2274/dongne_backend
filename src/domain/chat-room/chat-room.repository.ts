@@ -91,7 +91,7 @@ export class ChatRoomRepository {
   }
 
   async deleteChatUser(chatUserId): Promise<void> {
-    await this.chatUserRepository.delete(chatUserId);
+    await this.chatUserRepository.delete({ id: chatUserId });
   }
 
   async createChatRecord(
@@ -115,7 +115,7 @@ export class ChatRoomRepository {
   }
 
   async deleteChatRoom(chatId) {
-    await this.chatRepository.delete(chatId);
+    await this.chatRepository.delete({ id: chatId });
   }
 
   async findOneById(id: number): Promise<Chats> {
@@ -156,6 +156,8 @@ export class ChatRoomRepository {
   }
 
   async updateChatRoomMax(chatRoomId: number, newMax: number) {
+    // queryRunner 로 업데이트
+
     const isChatRoom = await this.chatRepository.findOne({
       where: { id: chatRoomId },
     });
