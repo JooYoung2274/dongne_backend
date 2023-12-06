@@ -14,14 +14,11 @@ const databaseModule = TypeOrmModule.forRootAsync({
   useFactory: () => {
     return {
       type: 'postgres',
-      host: '127.0.0.1',
-      port: 5433,
-      username: 'postgres',
-      password: '1008',
+      host: process.env.DB_HOST_POSTGRES,
+      port: 5432,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE_POSTGRES,
-      // username: process.env.DB_USERNAME_POSTGRES,
-      // password: process.env.DB_PASSWORD_POSTGRES,
-      // database: process.env.DB_DATABASE_POSTGRES,
       entities: [
         Users,
         Chats,
