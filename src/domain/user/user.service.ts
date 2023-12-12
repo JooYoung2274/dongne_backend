@@ -11,12 +11,18 @@ import { setAddressDto } from './dto/request.setAddress.dto';
 import { DataSource } from 'typeorm';
 import { refreshTokenDto } from './dto/request.refresh.dto';
 import { Transactional } from 'typeorm-transactional';
+import { AreaRepository } from './area.repository';
+import { UserAreaRepository } from './user-area.repository';
+import { ChatUserRepository } from './chat-user.repository';
 
 @Injectable()
 export class UserService {
   KAKAP_KEY = process.env.KAKAO_KEY;
   constructor(
     private readonly userRepository: UserRepository,
+    private readonly areaRepository: AreaRepository,
+    private readonly userAreaRepository: UserAreaRepository,
+    private readonly chatUserRepository: ChatUserRepository,
     private readonly jwtService: JwtService,
     private readonly axiosClass: AxiosClass,
     private dataSource: DataSource,
@@ -150,7 +156,7 @@ export class UserService {
   }
 
   async checkAddress(body: checkAddressDto): Promise<Areas> {
-    const isArea = await this.userRepository.findArea(body);
+    const isArea = await this.areaRepository.findArea(body);
 
     if (!isArea) {
       //위도 경도 찾고
@@ -168,7 +174,7 @@ export class UserService {
       const latitude = isKakaoMapData?.documents[0]?.road_address?.y;
 
       //신규 지역 등록
-      const newArea = await this.userRepository.createArea(
+      const newArea = await this.areaRepository.createArea(
         body,
         longitude,
         latitude,
@@ -179,7 +185,7 @@ export class UserService {
   }
 
   async isAddress(user): Promise<Areas> {
-    const isArea = await this.userRepository.findAreaByUserId(user.id);
+    const isArea = await this.areaRepository.findAreaByUserId(user.id);
     if (!isArea) {
       throw new BadRequestException('주소가 등록되어 있지 않습니다.');
     }
@@ -188,24 +194,28 @@ export class UserService {
 
   @Transactional()
   async setAddress(body: setAddressDto, user): Promise<void> {
-    const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
+    const isUserArea = await this.userAreaRepository.findUserAreaByUserId(
+      user.id,
+    );
 
     // 만약 참여하고 있는 채팅이 있다면 주소 변경 불가
     // 근데 여기서 chatRoomModule을 import하면 순환참조가.....
     // 귀찮아도 area module 따로 만들고, chatRoom이랑 chatUser도 분리하는게 좋을거 같은데 일단
     // 그냥 여기다가도 chatUser entity를 import해서 쓰자 일단은
 
-    const isChatUser = await this.userRepository.findChatUserByUserId(user.id);
+    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
+      user.id,
+    );
 
     if (isChatUser) {
       throw new BadRequestException('이미 참여중인 채팅방이 있습니다.');
     }
 
     if (isUserArea) {
-      await this.userRepository.deleteUserArea(user.id);
+      await this.userAreaRepository.deleteUserArea(user.id);
     }
 
-    await this.userRepository.createUserArea(body, user.id);
+    await this.userAreaRepository.createUserArea(body, user.id);
     return;
   }
 

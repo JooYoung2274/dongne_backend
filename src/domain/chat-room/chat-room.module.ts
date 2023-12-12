@@ -7,14 +7,15 @@ import { Chats } from '../entities/chat';
 import { ChatUsers } from '../entities/chatUser';
 import { UserModule } from '../user/user.module';
 import { ChatRecords } from '../entities/chatRecord';
+import { ChatRecordRepository } from './chat-record.repository';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Chats, ChatUsers, ChatRecords]),
     UserModule,
   ],
-  providers: [ChatRoomService, ChatRoomRepository],
+  providers: [ChatRoomService, ChatRoomRepository, ChatRecordRepository],
   controllers: [ChatRoomController],
-  exports: [ChatRoomRepository],
+  exports: [ChatRoomRepository, ChatRecordRepository],
 })
 export class ChatRoomModule {}
