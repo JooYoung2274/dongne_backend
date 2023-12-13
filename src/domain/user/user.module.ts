@@ -7,10 +7,10 @@ import { UserRepository } from './user.repository';
 import { Users } from '../entities/user';
 import { JwtStrategy } from './passport/jwt.strategy';
 import { GoogleStrategy } from './passport/google.strategy';
-import { UserAreas } from '../entities/userArea';
-import { Areas } from '../entities/area';
 import { AxiosClass } from 'src/util/axios.class';
-import { ChatUsers } from '../entities/chatUser';
+import { AreaRepository } from './area.repository';
+import { UserAreaRepository } from './user-area.repository';
+import { ChatUserRepository } from './chat-user.repository';
 
 @Module({
   imports: [
@@ -20,16 +20,24 @@ import { ChatUsers } from '../entities/chatUser';
         signOptions: { expiresIn: '7d' },
       }),
     }),
-    TypeOrmModule.forFeature([Users, UserAreas, Areas, ChatUsers]),
+    TypeOrmModule.forFeature([Users]),
   ],
   providers: [
     UserService,
     UserRepository,
+    AreaRepository,
+    UserAreaRepository,
+    ChatUserRepository,
     GoogleStrategy,
     JwtStrategy,
     AxiosClass,
   ],
   controllers: [UserController],
-  exports: [UserRepository],
+  exports: [
+    UserRepository,
+    AreaRepository,
+    UserAreaRepository,
+    ChatUserRepository,
+  ],
 })
 export class UserModule {}

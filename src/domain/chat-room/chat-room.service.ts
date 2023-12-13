@@ -8,13 +8,19 @@ import { ChatUsers } from '../entities/chatUser';
 import { changeChatRoomStatusDto } from './dto/request.changeChatRoomStatus.dto';
 import { paymentDto } from './dto/request.changePaymentStatus.dto';
 import { Transactional } from 'typeorm-transactional';
+import { UserAreaRepository } from '../user/user-area.repository';
+import { ChatUserRepository } from '../user/chat-user.repository';
+import { ChatRecordRepository } from './chat-record.repository';
 
 @Injectable()
 export class ChatRoomService {
   KAKAP_KEY = process.env.KAKAO_KEY;
   constructor(
     private readonly chatRoomRepository: ChatRoomRepository,
+    private readonly chatUserRepository: ChatUserRepository,
+    private readonly chatRecordRepository: ChatRecordRepository,
     private readonly userRepository: UserRepository,
+    private readonly userAreaRepository: UserAreaRepository,
   ) {}
 
   @Transactional()
@@ -25,7 +31,7 @@ export class ChatRoomService {
       throw new BadRequestException('배달비는 인원수로 나누어 떨어져야 합니다');
     }
 
-    const isChatRoom = await this.chatRoomRepository.findChatUserByUserId(
+    const isChatRoom = await this.chatUserRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -35,7 +41,7 @@ export class ChatRoomService {
 
     const newChatRoom = await this.chatRoomRepository.createChatRoom(body);
 
-    await this.chatRoomRepository.createChatUser(
+    await this.chatUserRepository.createChatUser(
       newChatRoom.id,
       user.id,
       true,
@@ -46,14 +52,16 @@ export class ChatRoomService {
   }
 
   async getChatRoomList(user): Promise<any> {
-    const isUserArea = await this.userRepository.findUserAreaByUserId(user.id);
+    const isUserArea = await this.userAreaRepository.findUserAreaByUserId(
+      user.id,
+    );
 
     return await this.chatRoomRepository.getChatRoomList(isUserArea.AreaId);
   }
 
   @Transactional()
   async joinChatRoom(body: joinChatRoomDto, user): Promise<ChatUsers> {
-    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -64,13 +72,13 @@ export class ChatRoomService {
     const isUser = await this.userRepository.findOneById(user.id);
 
     // 채팅기록 db에 message 저장
-    await this.chatRoomRepository.createChatRecord(
+    await this.chatRecordRepository.createChatRecord(
       body.ChatRoomId,
       `${isUser.nickname}님이 입장하셨습니다.`,
       user.id,
     );
 
-    const result = await this.chatRoomRepository.createChatUser(
+    const result = await this.chatUserRepository.createChatUser(
       body.ChatRoomId,
       user.id,
       false,
@@ -82,7 +90,7 @@ export class ChatRoomService {
 
   @Transactional()
   async leaveChatRoom(body: joinChatRoomDto, user): Promise<void> {
-    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -97,13 +105,13 @@ export class ChatRoomService {
     const isUser = await this.userRepository.findOneById(user.id);
 
     // 채팅기록 db에 message 저장
-    await this.chatRoomRepository.createChatRecord(
+    await this.chatRecordRepository.createChatRecord(
       body.ChatRoomId,
       `${isUser.nickname}님이 퇴장하셨습니다.`,
       user.id,
     );
 
-    await this.chatRoomRepository.deleteChatUser(isChatUser.id);
+    await this.chatUserRepository.deleteChatUser(isChatUser.id);
 
     if (isChatUser.isHost) {
       await this.chatRoomRepository.deleteChatRoom(body.ChatRoomId);
@@ -113,7 +121,7 @@ export class ChatRoomService {
   }
 
   async getChatRecord(user): Promise<number> {
-    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -130,7 +138,7 @@ export class ChatRoomService {
     chatRoomId: number,
     user,
   ) {
-    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -163,7 +171,7 @@ export class ChatRoomService {
 
     if (body.statusId === 3) {
       const isChatUserList =
-        await this.chatRoomRepository.findChatUserisPaidList(chatRoomId, false);
+        await this.chatUserRepository.findChatUserisPaidList(chatRoomId, false);
 
       if (isChatUserList.length) {
         throw new BadRequestException('아직 입금하지 않은 인원이 있습니다');
@@ -173,7 +181,7 @@ export class ChatRoomService {
     if (body.statusId === 2) {
       // chatUser 인원 찾고 max랑 비교해서 다르면 chatRoom의 max 변경
       const isChatUserList =
-        await this.chatRoomRepository.findChatUserList(chatRoomId);
+        await this.chatUserRepository.findChatUserList(chatRoomId);
 
       if (isChatUserList.length < isChatRoom.max) {
         await this.chatRoomRepository.updateChatRoomMax(
@@ -193,7 +201,7 @@ export class ChatRoomService {
 
   @Transactional()
   async changePaymentStatus(body: paymentDto, id: number, user) {
-    const isChatUser = await this.chatRoomRepository.findChatUserByUserId(
+    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
       user.id,
     );
 
@@ -201,10 +209,10 @@ export class ChatRoomService {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
     }
 
-    await this.chatRoomRepository.updatePaymentStatus(body, id);
+    await this.chatUserRepository.updatePaymentStatus(body, id);
 
     const isChatUserisPaidList =
-      await this.chatRoomRepository.findChatUserisPaidList(id, true);
+      await this.chatUserRepository.findChatUserisPaidList(id, true);
     const isChatRoom = await this.chatRoomRepository.findOneById(id);
 
     if (isChatUserisPaidList.length === isChatRoom.max) {

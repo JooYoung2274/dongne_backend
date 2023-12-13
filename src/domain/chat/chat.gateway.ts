@@ -12,6 +12,7 @@ import {
 import { Socket, Server } from 'socket.io';
 import { UserRepository } from '../user/user.repository';
 import { ChatRoomRepository } from '../chat-room/chat-room.repository';
+import { ChatRecordRepository } from '../chat-room/chat-record.repository';
 
 @WebSocketGateway()
 export class EventsGateway
@@ -20,6 +21,7 @@ export class EventsGateway
   constructor(
     private userRepository: UserRepository,
     private chatRoomRepository: ChatRoomRepository,
+    private chatRecordRepository: ChatRecordRepository,
   ) {}
   @WebSocketServer() public server: Server;
 
@@ -58,7 +60,7 @@ export class EventsGateway
     const roomId = socket['dongneData'].roomId;
 
     // 채팅기록 db에 저장해야함
-    await this.chatRoomRepository.createChatRecord(
+    await this.chatRecordRepository.createChatRecord(
       Number(roomId),
       data.message,
       socket['dongneData'].userId,
@@ -103,7 +105,7 @@ export class EventsGateway
     socket.join(data.roomId);
 
     // 이전 채팅 기록도 리턴해버림
-    const chatRecord = await this.chatRoomRepository.getChatRecord(
+    const chatRecord = await this.chatRecordRepository.getChatRecord(
       Number(data.roomId),
     );
 
