@@ -31,8 +31,9 @@ export class EventsGateway
     @ConnectedSocket() socket: Socket,
   ) {
     // 방에 들어갈 때
-    socket['dongneData'].userId = data.id;
-    socket['dongneData'].roomId = data.roomId;
+
+    socket['dongneData']['userId'] = data.id;
+    socket['dongneData']['roomId'] = data.roomId;
 
     // 조인룸 시켜버림
     socket.join(data.roomId);
@@ -52,13 +53,14 @@ export class EventsGateway
     console.log('login', socket['dongneData']);
   }
 
-  @SubscribeMessage('chat')
+  @SubscribeMessage('chatting')
   async andleChat(
     @MessageBody() data: { message: string },
     @ConnectedSocket() socket: Socket,
   ) {
     const roomId = socket['dongneData'].roomId;
-
+    console.log('chatting', socket['dongneData']);
+    console.log('chatting', data.message);
     // 채팅기록 db에 저장해야함
     await this.chatRecordRepository.createChatRecord(
       Number(roomId),
@@ -66,7 +68,7 @@ export class EventsGateway
       socket['dongneData'].userId,
     );
 
-    socket.to(roomId).emit('chat', data.message);
+    socket.to(roomId).emit('chat', data);
   }
 
   @SubscribeMessage('leaveRoom')
@@ -118,7 +120,11 @@ export class EventsGateway
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log('connected', socket['dongneData']);
+    const dongneData = {
+      userId: null,
+      roomId: null,
+    };
+    console.log('connected', (socket['dongneData'] = dongneData));
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
