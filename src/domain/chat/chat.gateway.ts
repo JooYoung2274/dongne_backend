@@ -31,7 +31,7 @@ export class EventsGateway
     @ConnectedSocket() socket: Socket,
   ) {
     // 방에 들어갈 때
-
+    console.log(socket['dongneData']);
     socket['dongneData']['userId'] = data.id;
     socket['dongneData']['roomId'] = data.roomId;
 
@@ -59,8 +59,7 @@ export class EventsGateway
     @ConnectedSocket() socket: Socket,
   ) {
     const roomId = socket['dongneData'].roomId;
-    console.log('chatting', socket['dongneData']);
-    console.log('chatting', data.message);
+
     // 채팅기록 db에 저장해야함
     await this.chatRecordRepository.createChatRecord(
       Number(roomId),
@@ -68,7 +67,7 @@ export class EventsGateway
       socket['dongneData'].userId,
     );
 
-    socket.to(roomId).emit('chat', data);
+    socket.to(roomId).emit('chatting', data);
   }
 
   @SubscribeMessage('leaveRoom')
@@ -78,11 +77,12 @@ export class EventsGateway
   ) {
     // 룸에서 나가버림
     socket.leave(data.roomId);
-
-    // 방에서 나갔다고 알려줌
-    socket.emit('leaveRoom', data.roomId);
-
-    // 방에 있는 인원들에게 새로운 사람 들어왔다고 알려줌
+    const dongneData = {
+      userId: null,
+      roomId: null,
+    };
+    console.log('leaveRoom', (socket['dongneData'] = dongneData));
+    // 방에 있는 인원들에게 알려줌
     // 유저정보 찾아서 보내줘야함
     const isUser = await this.userRepository.findOneById(data.id);
     const message = `${isUser.nickname}님이 퇴장하셨습니다.`;
@@ -91,7 +91,6 @@ export class EventsGateway
       message: message,
       userProfile: isUser.profileImage,
     });
-    console.log('leaveRoom', socket['dongneData']);
   }
 
   @SubscribeMessage('reJoinRoom')
