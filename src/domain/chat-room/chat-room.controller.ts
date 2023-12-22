@@ -86,7 +86,7 @@ export class ChatRoomController {
     return;
   }
 
-  @ApiOperation({ summary: '입금 완료로 상태 변경하기' })
+  @ApiOperation({ summary: '(참여자) 전체 입금 완료로 상태 변경하기' })
   @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard('jwt'))
   @Put('payment/:chatRoomId')
@@ -98,8 +98,6 @@ export class ChatRoomController {
     await this.chatRoomService.changePaymentStatus(body, chatRoomId, user);
     return;
   }
-
-  // @ApiOperation()
 
   // @ApiOperation({ summary: '내가 주문한 메뉴 금액 입력하기' })
   // @ApiOperation({ summary: '내가 입금한 메뉴 금액 불러오기' })
