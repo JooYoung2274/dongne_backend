@@ -11,7 +11,6 @@ import {
 
 import { Socket, Server } from 'socket.io';
 import { UserRepository } from '../user/user.repository';
-import { ChatRoomRepository } from '../chat-room/chat-room.repository';
 import { ChatRecordRepository } from '../chat-room/chat-record.repository';
 
 @WebSocketGateway()
@@ -20,7 +19,6 @@ export class EventsGateway
 {
   constructor(
     private userRepository: UserRepository,
-    private chatRoomRepository: ChatRoomRepository,
     private chatRecordRepository: ChatRecordRepository,
   ) {}
   @WebSocketServer() public server: Server;
