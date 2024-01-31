@@ -7,6 +7,7 @@ import { UserModule } from './domain/user/user.module';
 import { ChatRoomModule } from './domain/chat-room/chat-room.module';
 import { EventsModule } from './domain/chat/chat.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { FriendModule } from './domain/friend/friend.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ServeStaticModule.forRoot({
       rootPath: './',
     }),
+    FriendModule,
   ],
   controllers: [AppController],
   providers: [AppService],

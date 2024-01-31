@@ -5,6 +5,7 @@ import { Areas } from 'src/domain/entities/area';
 import { Chats } from 'src/domain/entities/chat';
 import { ChatRecords } from 'src/domain/entities/chatRecord';
 import { ChatUsers } from 'src/domain/entities/chatUser';
+import { Friends } from 'src/domain/entities/friend';
 import { Statuses } from 'src/domain/entities/status';
 import { Users } from 'src/domain/entities/user';
 import { UserAreas } from 'src/domain/entities/userArea';
@@ -29,6 +30,7 @@ const databaseModule = TypeOrmModule.forRootAsync({
         Statuses,
         UserAreas,
         ChatRecords,
+        Friends,
       ],
       autoLoadEntities: true,
       charset: 'utf8mb4',
