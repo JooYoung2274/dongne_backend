@@ -11,6 +11,7 @@ import { Transactional } from 'typeorm-transactional';
 import { UserAreaRepository } from '../user/user-area.repository';
 import { ChatUserRepository } from '../user/chat-user.repository';
 import { ChatRecordRepository } from './chat-record.repository';
+import { CategoryRepository } from './category.respository';
 
 @Injectable()
 export class ChatRoomService {
@@ -21,6 +22,7 @@ export class ChatRoomService {
     private readonly chatRecordRepository: ChatRecordRepository,
     private readonly userRepository: UserRepository,
     private readonly userAreaRepository: UserAreaRepository,
+    private readonly categoryRepository: CategoryRepository,
   ) {}
 
   @Transactional()
@@ -51,11 +53,24 @@ export class ChatRoomService {
     return newChatRoom;
   }
 
-  async getChatRoomList(user): Promise<any> {
+  async getChatRoomList(user, category?: string): Promise<any> {
     const { id: userId } = user;
     const isUserArea = await this.userAreaRepository.findOne({
       where: { UserId: userId },
     });
+
+    if (category) {
+      const isCategory = await this.categoryRepository.findOne({
+        where: { name: category },
+      });
+      if (!isCategory) {
+        throw new BadRequestException('잘못된 카테고리입니다');
+      }
+      await this.chatRoomRepository.getChatRoomList(
+        isUserArea.AreaId,
+        isCategory.id,
+      );
+    }
 
     return await this.chatRoomRepository.getChatRoomList(isUserArea.AreaId);
   }

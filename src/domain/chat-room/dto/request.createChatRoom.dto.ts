@@ -11,15 +11,6 @@ export class createChatRoomDto {
   })
   title: string;
 
-  @IsString()
-  @ApiProperty({
-    description: '메뉴카테고리',
-    required: true,
-    nullable: false,
-    example: '치킨',
-  })
-  category: string;
-
   @IsNumber()
   @ApiProperty({
     description: '최대인원',
@@ -28,6 +19,15 @@ export class createChatRoomDto {
     example: 4,
   })
   max: number;
+
+  @IsNumber()
+  @ApiProperty({
+    description: '카테고리 ID',
+    required: true,
+    nullable: false,
+    example: 1,
+  })
+  CategoryId: number;
 
   @IsNumber()
   @ApiProperty({
