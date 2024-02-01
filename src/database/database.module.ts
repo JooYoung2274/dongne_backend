@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Areas } from 'src/domain/entities/area';
+import { Categories } from 'src/domain/entities/category';
 import { Chats } from 'src/domain/entities/chat';
 import { ChatRecords } from 'src/domain/entities/chatRecord';
 import { ChatUsers } from 'src/domain/entities/chatUser';
@@ -31,6 +32,7 @@ const databaseModule = TypeOrmModule.forRootAsync({
         UserAreas,
         ChatRecords,
         Friends,
+        Categories,
       ],
       autoLoadEntities: true,
       charset: 'utf8mb4',
