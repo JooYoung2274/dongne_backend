@@ -63,12 +63,12 @@ export class ChatRoomRepository extends Repository<Chats> {
     await this.delete({ id: chatId });
   }
 
-  async findOneById(id: number): Promise<Chats> {
-    const result = await this.findOne({
-      where: { id },
-    });
-    return result;
-  }
+  // async findOneById(id: number): Promise<Chats> {
+  //   const result = await this.findOne({
+  //     where: { id },
+  //   });
+  //   return result;
+  // }
 
   async updateChatRoomStatus(id: number, statusId: number) {
     const isChatRoom = await this.findOne({ where: { id } });

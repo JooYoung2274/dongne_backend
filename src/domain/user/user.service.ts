@@ -53,7 +53,9 @@ export class UserService {
     }
 
     if (!isUser) {
-      const isUserEmail = await this.userRepository.findOneByEmail(email);
+      const isUserEmail = await this.userRepository.findOne({
+        where: { email },
+      });
 
       // const oauth = isUserEmail.kakaoId
       //   ? '카카오'
@@ -92,8 +94,9 @@ export class UserService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const { refreshToken } = body;
 
-    const isUser =
-      await this.userRepository.findOneByRefreshToken(refreshToken);
+    const isUser = await this.userRepository.findOne({
+      where: { refreshToken },
+    });
     if (!isUser) {
       throw new BadRequestException('로그인이 필요합니다.');
     }
@@ -126,7 +129,7 @@ export class UserService {
   }
 
   async nicknameDuplicationCheck(nickname: string): Promise<void> {
-    const isUser = await this.userRepository.findOneByNickname(nickname);
+    const isUser = await this.userRepository.findOne({ where: { nickname } });
     if (isUser) {
       throw new BadRequestException('이미 사용중인 닉네임입니다.');
     }
@@ -134,7 +137,7 @@ export class UserService {
   }
 
   async emailDuplicationCheck(email: string): Promise<void> {
-    const isUser = await this.userRepository.findOneByEmail(email);
+    const isUser = await this.userRepository.findOne({ where: { email } });
     if (isUser) {
       throw new BadRequestException('이미 사용중인 이메일입니다.');
     }
@@ -154,7 +157,10 @@ export class UserService {
   }
 
   async checkAddress(body: checkAddressDto): Promise<Areas> {
-    const isArea = await this.areaRepository.findArea(body);
+    const { city, state, address, apartmentName } = body;
+    const isArea = await this.areaRepository.findOne({
+      where: { city, state, address, apartmentName },
+    });
 
     if (!isArea) {
       //위도 경도 찾고
@@ -192,28 +198,29 @@ export class UserService {
 
   @Transactional()
   async setAddress(body: setAddressDto, user): Promise<void> {
-    const isUserArea = await this.userAreaRepository.findUserAreaByUserId(
-      user.id,
-    );
+    const { id: userId } = user;
+    const isUserArea = await this.userAreaRepository.findOne({
+      where: { UserId: userId },
+    });
 
     // 만약 참여하고 있는 채팅이 있다면 주소 변경 불가
     // 근데 여기서 chatRoomModule을 import하면 순환참조가.....
     // 귀찮아도 area module 따로 만들고, chatRoom이랑 chatUser도 분리하는게 좋을거 같은데 일단
     // 그냥 여기다가도 chatUser entity를 import해서 쓰자 일단은
 
-    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (isChatUser) {
       throw new BadRequestException('이미 참여중인 채팅방이 있습니다.');
     }
 
     if (isUserArea) {
-      await this.userAreaRepository.deleteUserArea(user.id);
+      await this.userAreaRepository.deleteUserArea(userId);
     }
 
-    await this.userAreaRepository.createUserArea(body, user.id);
+    await this.userAreaRepository.createUserArea(body, userId);
     return;
   }
 
@@ -241,7 +248,10 @@ export class UserService {
   }
 
   async editProfileImage(file, user) {
-    const isUser = await this.userRepository.findOneById(user.id);
+    const { id: userId } = user;
+    const isUser = await this.userRepository.findOne({
+      where: { id: userId },
+    });
     if (!isUser) {
       throw new BadRequestException('유저를 찾을 수 없습니다.');
     }
