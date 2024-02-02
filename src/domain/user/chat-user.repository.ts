@@ -9,12 +9,12 @@ export class ChatUserRepository extends Repository<ChatUsers> {
     super(ChatUsers, dataSource.createEntityManager());
   }
 
-  async findChatUserByUserId(userId: number): Promise<ChatUsers> {
-    const result = await this.findOne({
-      where: { UserId: userId },
-    });
-    return result;
-  }
+  // async findChatUserByUserId(userId: number): Promise<ChatUsers> {
+  //   const result = await this.findOne({
+  //     where: { UserId: userId },
+  //   });
+  //   return result;
+  // }
 
   async createChatUser(
     chatId: number,
@@ -45,17 +45,17 @@ export class ChatUserRepository extends Repository<ChatUsers> {
     await this.save(isChatUser);
   }
 
-  async findChatUserList(chatRoomId: number) {
-    const result = await this.find({
-      where: { ChatId: chatRoomId },
-    });
-    return result;
-  }
+  // async findChatUserList(chatRoomId: number) {
+  //   const result = await this.find({
+  //     where: { ChatId: chatRoomId },
+  //   });
+  //   return result;
+  // }
 
-  async findChatUserisPaidList(chatRoomId: number, isPaid: boolean) {
-    const result = await this.find({
-      where: { ChatId: chatRoomId, isPaid: isPaid },
-    });
-    return result;
-  }
+  // async findChatUserisPaidList(chatRoomId: number, isPaid: boolean) {
+  //   const result = await this.find({
+  //     where: { ChatId: chatRoomId, isPaid: isPaid },
+  //   });
+  //   return result;
+  // }
 }

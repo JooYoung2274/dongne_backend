@@ -9,13 +9,13 @@ export class AreaRepository extends Repository<Areas> {
     super(Areas, dataSource.createEntityManager());
   }
 
-  async findArea(body: checkAddressDto): Promise<Areas> {
-    const { city, state, address, apartmentName } = body;
-    const result = await this.findOne({
-      where: { city, state, address, apartmentName },
-    });
-    return result;
-  }
+  // async findArea(body: checkAddressDto): Promise<Areas> {
+  //   const { city, state, address, apartmentName } = body;
+  //   const result = await this.findOne({
+  //     where: { city, state, address, apartmentName },
+  //   });
+  //   return result;
+  // }
 
   async createArea(
     body: checkAddressDto,

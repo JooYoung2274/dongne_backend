@@ -11,6 +11,7 @@ import { Transactional } from 'typeorm-transactional';
 import { UserAreaRepository } from '../user/user-area.repository';
 import { ChatUserRepository } from '../user/chat-user.repository';
 import { ChatRecordRepository } from './chat-record.repository';
+import { CategoryRepository } from './category.respository';
 
 @Injectable()
 export class ChatRoomService {
@@ -21,19 +22,20 @@ export class ChatRoomService {
     private readonly chatRecordRepository: ChatRecordRepository,
     private readonly userRepository: UserRepository,
     private readonly userAreaRepository: UserAreaRepository,
+    private readonly categoryRepository: CategoryRepository,
   ) {}
 
   @Transactional()
   async createChatRoom(body: createChatRoomDto, user): Promise<Chats> {
     const { max, deliveryFee } = body;
-
+    const { id: userId } = user;
     if (deliveryFee % max) {
       throw new BadRequestException('배달비는 인원수로 나누어 떨어져야 합니다');
     }
 
-    const isChatRoom = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const isChatRoom = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (isChatRoom) {
       throw new BadRequestException('이미 참여하고 있는 채팅방이 존재합니다');
@@ -51,25 +53,41 @@ export class ChatRoomService {
     return newChatRoom;
   }
 
-  async getChatRoomList(user): Promise<any> {
-    const isUserArea = await this.userAreaRepository.findUserAreaByUserId(
-      user.id,
-    );
+  async getChatRoomList(user, category?: string): Promise<any> {
+    const { id: userId } = user;
+    const isUserArea = await this.userAreaRepository.findOne({
+      where: { UserId: userId },
+    });
+
+    if (category) {
+      const isCategory = await this.categoryRepository.findOne({
+        where: { name: category },
+      });
+      if (!isCategory) {
+        throw new BadRequestException('잘못된 카테고리입니다');
+      }
+      await this.chatRoomRepository.getChatRoomList(
+        isUserArea.AreaId,
+        isCategory.id,
+      );
+    }
 
     return await this.chatRoomRepository.getChatRoomList(isUserArea.AreaId);
   }
 
   @Transactional()
   async joinChatRoom(body: joinChatRoomDto, user): Promise<ChatUsers> {
-    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const { id: userId } = user;
+
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (isChatUser) {
       throw new BadRequestException('이미 참여하고 있는 채팅방이 존재합니다');
     }
 
-    const isUser = await this.userRepository.findOneById(user.id);
+    const isUser = await this.userRepository.findOne({ where: { id: userId } });
 
     // 채팅기록 db에 message 저장
     await this.chatRecordRepository.createChatRecord(
@@ -90,9 +108,11 @@ export class ChatRoomService {
 
   @Transactional()
   async leaveChatRoom(body: joinChatRoomDto, user): Promise<void> {
-    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const { id: userId } = user;
+
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (!isChatUser) {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
@@ -102,7 +122,7 @@ export class ChatRoomService {
       throw new BadRequestException('잘못된 접근입니다');
     }
 
-    const isUser = await this.userRepository.findOneById(user.id);
+    const isUser = await this.userRepository.findOne({ where: { id: userId } });
 
     // 채팅기록 db에 message 저장
     await this.chatRecordRepository.createChatRecord(
@@ -121,9 +141,10 @@ export class ChatRoomService {
   }
 
   async getChatRecord(user): Promise<number> {
-    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const { id: userId } = user;
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (!isChatUser) {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
@@ -138,9 +159,10 @@ export class ChatRoomService {
     chatRoomId: number,
     user,
   ) {
-    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const { id: userId } = user;
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (!isChatUser) {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
@@ -155,9 +177,9 @@ export class ChatRoomService {
     }
 
     // 현재 룸 정보 찾아서
-    const isChatRoom = await this.chatRoomRepository.findOneById(
-      isChatUser.ChatId,
-    );
+    const isChatRoom = await this.chatRoomRepository.findOne({
+      where: { id: isChatUser.ChatId },
+    });
 
     // 현재 룸의 상태가 변경하려는 상태와 같으면 에러
     if (isChatRoom.StatusId === body.statusId) {
@@ -170,9 +192,9 @@ export class ChatRoomService {
     }
 
     if (body.statusId === 3) {
-      const isChatUserList =
-        await this.chatUserRepository.findChatUserisPaidList(chatRoomId, false);
-
+      const isChatUserList = await this.chatUserRepository.find({
+        where: { ChatId: chatRoomId, isPaid: false },
+      });
       if (isChatUserList.length) {
         throw new BadRequestException('아직 입금하지 않은 인원이 있습니다');
       }
@@ -180,9 +202,9 @@ export class ChatRoomService {
 
     if (body.statusId === 2) {
       // chatUser 인원 찾고 max랑 비교해서 다르면 chatRoom의 max 변경
-      const isChatUserList =
-        await this.chatUserRepository.findChatUserList(chatRoomId);
-
+      const isChatUserList = await this.chatUserRepository.find({
+        where: { ChatId: chatRoomId },
+      });
       if (isChatUserList.length < isChatRoom.max) {
         await this.chatRoomRepository.updateChatRoomMax(
           chatRoomId,
@@ -201,9 +223,10 @@ export class ChatRoomService {
 
   @Transactional()
   async changePaymentStatus(body: paymentDto, id: number, user) {
-    const isChatUser = await this.chatUserRepository.findChatUserByUserId(
-      user.id,
-    );
+    const { id: userId } = user;
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
 
     if (!isChatUser) {
       throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
@@ -211,9 +234,10 @@ export class ChatRoomService {
 
     await this.chatUserRepository.updatePaymentStatus(body, id);
 
-    const isChatUserisPaidList =
-      await this.chatUserRepository.findChatUserisPaidList(id, true);
-    const isChatRoom = await this.chatRoomRepository.findOneById(id);
+    const isChatUserisPaidList = await this.chatUserRepository.find({
+      where: { ChatId: id, isPaid: true },
+    });
+    const isChatRoom = await this.chatRoomRepository.findOne({ where: { id } });
 
     if (isChatUserisPaidList.length === isChatRoom.max) {
       await this.chatRoomRepository.updateChatRoomStatus(id, 5);

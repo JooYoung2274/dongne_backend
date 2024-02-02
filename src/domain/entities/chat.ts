@@ -11,6 +11,7 @@ import { ChatUsers } from './chatUser';
 import { Statuses } from './status';
 import { Areas } from './area';
 import { ChatRecords } from './chatRecord';
+import { Categories } from './category';
 
 @Entity('chats')
 export class Chats {
@@ -69,6 +70,16 @@ export class Chats {
   })
   @JoinColumn([{ name: 'AreaId', referencedColumnName: 'id' }])
   Area: Areas;
+
+  @Column('int', { name: 'CategoryId' })
+  CategoryId: number;
+
+  @ManyToOne(() => Categories, (category) => category.Chat, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'CategoryId', referencedColumnName: 'id' }])
+  Category: Categories;
 
   @OneToMany(() => ChatUsers, (chatUser) => chatUser.Chat)
   ChatUser: ChatUsers[];

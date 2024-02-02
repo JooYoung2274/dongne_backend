@@ -9,15 +9,15 @@ export class UserRepository extends Repository<Users> {
     super(Users, dataSource.createEntityManager());
   }
 
-  async findOneByEmail(email: string): Promise<Users> {
-    const result = await this.findOne({ where: { email } });
-    return result;
-  }
+  // async findOneByEmail(email: string): Promise<Users> {
+  //   const result = await this.findOne({ where: { email } });
+  //   return result;
+  // }
 
-  async findOneByNickname(nickname: string): Promise<Users> {
-    const result = await this.findOne({ where: { nickname } });
-    return result;
-  }
+  // async findOneByNickname(nickname: string): Promise<Users> {
+  //   const result = await this.findOne({ where: { nickname } });
+  //   return result;
+  // }
 
   async findOneByOauthId(kakaoId, naverId, googleId, appleId) {
     const result = await this.createQueryBuilder('user')
@@ -49,21 +49,21 @@ export class UserRepository extends Repository<Users> {
     return newUser;
   }
 
-  async findOneById(id: number) {
-    const result = await this.findOne({ where: { id } });
-    return result;
-  }
+  // async findOneById(id: number) {
+  //   const result = await this.findOne({ where: { id } });
+  //   return result;
+  // }
 
   async deleteRefreshToken(id: number) {
     await this.update(id, { refreshToken: null });
   }
 
-  async findOneByRefreshToken(refreshToken: string): Promise<Users> {
-    const result = await this.findOne({
-      where: { refreshToken },
-    });
-    return result;
-  }
+  // async findOneByRefreshToken(refreshToken: string): Promise<Users> {
+  //   const result = await this.findOne({
+  //     where: { refreshToken },
+  //   });
+  //   return result;
+  // }
 
   async updateProfileImage(profileImage, id) {
     const isUser = await this.findOne({ where: { id } });

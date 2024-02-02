@@ -21,10 +21,10 @@ export class ChatRecordRepository extends Repository<ChatRecords> {
     await this.save(newChatRecord);
   }
 
-  async getChatRecord(chatId): Promise<ChatRecords[]> {
-    const result = await this.find({
-      where: { ChatId: chatId },
-    });
-    return result;
-  }
+  // async getChatRecord(chatId): Promise<ChatRecords[]> {
+  //   const result = await this.find({
+  //     where: { ChatId: chatId },
+  //   });
+  //   return result;
+  // }
 }

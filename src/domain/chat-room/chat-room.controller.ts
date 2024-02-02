@@ -5,10 +5,16 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ChatRoomService } from './chat-room.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { createChatRoomDto } from './dto/request.createChatRoom.dto';
 import { User } from 'src/common/decorator/user.decorator';
 import { AuthGuard } from '@nestjs/passport';
@@ -36,10 +42,18 @@ export class ChatRoomController {
 
   @ApiOperation({ summary: '채팅방 리스트' })
   @ApiBearerAuth('access-token')
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: '카테고리 \n전체 리스트 불러올거면 없어도 됨',
+  })
   @UseGuards(AuthGuard('jwt'))
   @Get('list')
-  async getChatRoomList(@User() user): Promise<any> {
-    return this.chatRoomService.getChatRoomList(user);
+  async getChatRoomList(
+    @User() user,
+    @Query('category') category?: string,
+  ): Promise<any> {
+    return this.chatRoomService.getChatRoomList(user, category);
   }
 
   @ApiOperation({ summary: '채팅방 입장' })

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Chats } from '../entities/chat';
 import { DataSource, Repository } from 'typeorm';
 import { createChatRoomDto } from './dto/request.createChatRoom.dto';
-import { CATEGORY_PROFILE } from 'src/constant/category-profile';
 
 @Injectable()
 export class ChatRoomRepository extends Repository<Chats> {
@@ -12,7 +11,7 @@ export class ChatRoomRepository extends Repository<Chats> {
 
   async createChatRoom(body: createChatRoomDto): Promise<Chats> {
     const newChatRoom = this.create();
-    newChatRoom.categoryProfile = CATEGORY_PROFILE[body.category];
+    newChatRoom.CategoryId = body.CategoryId;
     newChatRoom.StatusId = 1;
     newChatRoom.title = body.title;
     newChatRoom.orderLink = body.orderLink;
@@ -28,15 +27,19 @@ export class ChatRoomRepository extends Repository<Chats> {
     return newChatRoom;
   }
 
-  async getChatRoomList(AreaId: number): Promise<any> {
-    const data = await this.createQueryBuilder('chat')
+  async getChatRoomList(AreaId: number, categoryId?: number): Promise<any> {
+    const query = this.createQueryBuilder('chat')
       .leftJoin('chat.ChatUser', 'chatUser')
       .leftJoin('chatUser.User', 'user')
       .leftJoin('user.UserArea', 'userArea')
-      .where('userArea.AreaId = :AreaId', { AreaId })
-      .addSelect('COUNT(chatUser.ChatId)', 'count')
-      .groupBy('chat.id')
-      .getRawMany();
+      .where('userArea.AreaId = :AreaId', { AreaId });
+
+    if (categoryId) {
+      query.andWhere('chat.CategoryId = :categoryId', { categoryId });
+    }
+    query.addSelect('COUNT(chatUser.ChatId)', 'count').groupBy('chat.id');
+
+    const data = await query.getRawMany();
 
     const result = data.map((chat) => ({
       title: chat.chat_title,
@@ -46,7 +49,6 @@ export class ChatRoomRepository extends Repository<Chats> {
       logitude: chat.chat_longitude,
       latitude: chat.chat_latitude,
       restaurantName: chat.chat_restaurantName,
-      categoryProfile: chat.chat_categoryProfile,
       max: chat.chat_max,
       deliveryFee: chat.chat_deliveryFee,
       isAllPaid: chat.chat_isAllPaid,
@@ -63,12 +65,12 @@ export class ChatRoomRepository extends Repository<Chats> {
     await this.delete({ id: chatId });
   }
 
-  async findOneById(id: number): Promise<Chats> {
-    const result = await this.findOne({
-      where: { id },
-    });
-    return result;
-  }
+  // async findOneById(id: number): Promise<Chats> {
+  //   const result = await this.findOne({
+  //     where: { id },
+  //   });
+  //   return result;
+  // }
 
   async updateChatRoomStatus(id: number, statusId: number) {
     const isChatRoom = await this.findOne({ where: { id } });

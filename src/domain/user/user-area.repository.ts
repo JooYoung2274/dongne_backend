@@ -9,12 +9,12 @@ export class UserAreaRepository extends Repository<UserAreas> {
     super(UserAreas, dataSource.createEntityManager());
   }
 
-  async findUserAreaByUserId(userId: number): Promise<UserAreas> {
-    const result = await this.findOne({
-      where: { UserId: userId },
-    });
-    return result;
-  }
+  // async findUserAreaByUserId(userId: number): Promise<UserAreas> {
+  //   const result = await this.findOne({
+  //     where: { UserId: userId },
+  //   });
+  //   return result;
+  // }
 
   async createUserArea(
     body: setAddressDto,
