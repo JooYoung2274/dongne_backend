@@ -79,8 +79,6 @@ export class ChatRoomRepository extends Repository<Chats> {
   }
 
   async updateChatRoomMax(chatRoomId: number, newMax: number) {
-    // queryRunner 로 업데이트
-
     const isChatRoom = await this.findOne({
       where: { id: chatRoomId },
     });

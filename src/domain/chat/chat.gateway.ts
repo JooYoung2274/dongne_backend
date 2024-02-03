@@ -41,7 +41,9 @@ export class EventsGateway
 
     // 방에 있는 인원들에게 새로운 사람 들어왔다고 알려줌
     // 유저정보 찾아서 보내줘야함
-    const isUser = await this.userRepository.findOneById(data.id);
+    const isUser = await this.userRepository.findOne({
+      where: { id: data.id },
+    });
     const message = `${isUser.nickname}님이 입장하셨습니다.`;
 
     socket.to(data.roomId).emit('joinRoom', {
@@ -82,7 +84,9 @@ export class EventsGateway
     console.log('leaveRoom', (socket['dongneData'] = dongneData));
     // 방에 있는 인원들에게 알려줌
     // 유저정보 찾아서 보내줘야함
-    const isUser = await this.userRepository.findOneById(data.id);
+    const isUser = await this.userRepository.findOne({
+      where: { id: data.id },
+    });
     const message = `${isUser.nickname}님이 퇴장하셨습니다.`;
 
     socket.to(data.roomId).emit('leaveRoom', {
@@ -104,9 +108,9 @@ export class EventsGateway
     socket.join(data.roomId);
 
     // 이전 채팅 기록도 리턴해버림
-    const chatRecord = await this.chatRecordRepository.getChatRecord(
-      Number(data.roomId),
-    );
+    const chatRecord = await this.chatRecordRepository.find({
+      where: { ChatId: Number(data.roomId) },
+    });
 
     // 방에 들어갔다고 알려줌
     socket.emit('reJoinRoom', { roomId: data.roomId, chatRecord: chatRecord });

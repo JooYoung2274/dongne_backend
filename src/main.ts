@@ -18,7 +18,6 @@ async function bootstrap() {
       '- Dongne API Document 입니다. JWT 토큰은 가입 후 리턴된 accessToken을 좌측에 있는 Authorize에 등록해주세요.',
     )
     .setVersion('0.0.1')
-
     .addBearerAuth(
       {
         type: 'http',
