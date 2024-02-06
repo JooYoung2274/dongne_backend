@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Users } from './user';
-import { Areas } from './area';
 
 @Entity('reports')
 export class Reports {
@@ -26,4 +25,14 @@ export class Reports {
   })
   @JoinColumn([{ name: 'UserId', referencedColumnName: 'id' }])
   User: Users;
+
+  @Column('int', { name: 'ReportedId' })
+  ReportedId: number;
+
+  @ManyToOne(() => Users, (user) => user.Reports, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn([{ name: 'UserId', referencedColumnName: 'id' }])
+  ReportedId: Users;
 }
