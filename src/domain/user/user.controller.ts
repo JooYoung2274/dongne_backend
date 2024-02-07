@@ -26,6 +26,7 @@ import { setAddressDto } from './dto/request.setAddress.dto';
 import { refreshTokenDto } from './dto/request.refresh.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { reportDto } from './dto/request.report.dto';
 
 @ApiTags('유저')
 @Controller('user')
@@ -140,6 +141,15 @@ export class UserController {
     @User() user: any,
   ) {
     await this.userService.editProfileImage(file, user);
+    return;
+  }
+
+  @ApiOperation({ summary: '신고하기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Post('report')
+  async report(@Body() body: reportDto, @User() user) {
+    await this.userService.report(body, user);
     return;
   }
 }

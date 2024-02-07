@@ -14,6 +14,8 @@ import { Transactional } from 'typeorm-transactional';
 import { AreaRepository } from './area.repository';
 import { UserAreaRepository } from './user-area.repository';
 import { ChatUserRepository } from './chat-user.repository';
+import { reportDto } from './dto/request.report.dto';
+import { ReportsRepository } from './report.repository';
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,7 @@ export class UserService {
     private readonly areaRepository: AreaRepository,
     private readonly userAreaRepository: UserAreaRepository,
     private readonly chatUserRepository: ChatUserRepository,
+    private readonly reportsRepository: ReportsRepository,
     private readonly jwtService: JwtService,
     private readonly axiosClass: AxiosClass,
     private dataSource: DataSource,
@@ -258,5 +261,23 @@ export class UserService {
     const profileImage = file.filename;
     await this.userRepository.updateProfileImage(profileImage, user.id);
     return;
+  }
+
+  async report(body: reportDto, user) {
+    const { ReportedId } = body;
+    const { id: userId } = user;
+    if (userId === ReportedId) {
+      throw new BadRequestException('자신을 신고할 수 없습니다.');
+    }
+
+    const isReported = await this.reportsRepository.findOne({
+      where: { UserId: userId, ReportedId },
+    });
+
+    if (isReported) {
+      throw new BadRequestException('이미 신고한 유저입니다.');
+    }
+
+    await this.reportsRepository.createReport(body, userId);
   }
 }
