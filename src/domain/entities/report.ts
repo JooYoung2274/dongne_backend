@@ -13,6 +13,9 @@ export class Reports {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
 
+  @Column('varchar', { name: 'reason' })
+  reason: string;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -34,5 +37,5 @@ export class Reports {
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'UserId', referencedColumnName: 'id' }])
-  ReportedId: Users;
+  Reported: Users;
 }

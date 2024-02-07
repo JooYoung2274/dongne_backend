@@ -80,5 +80,5 @@ export class Users {
   Reports: Reports[];
 
   @OneToMany(() => Reports, (report) => report.User)
-  Report: Reports[];
+  Reported: Reports[];
 }

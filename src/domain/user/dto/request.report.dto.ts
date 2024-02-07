@@ -9,7 +9,7 @@ export class reportDto {
     required: true,
     example: 1,
   })
-  UserId: number;
+  ReportedId: number;
 
   @IsEnum(ReportReason)
   @ApiProperty({
