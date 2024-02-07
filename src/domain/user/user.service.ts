@@ -266,6 +266,7 @@ export class UserService {
   async report(body: reportDto, user) {
     const { ReportedId } = body;
     const { id: userId } = user;
+
     if (userId === ReportedId) {
       throw new BadRequestException('자신을 신고할 수 없습니다.');
     }
