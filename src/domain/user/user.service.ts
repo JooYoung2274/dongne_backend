@@ -210,11 +210,6 @@ export class UserService {
       where: { UserId: userId },
     });
 
-    // 만약 참여하고 있는 채팅이 있다면 주소 변경 불가
-    // 근데 여기서 chatRoomModule을 import하면 순환참조가.....
-    // 귀찮아도 area module 따로 만들고, chatRoom이랑 chatUser도 분리하는게 좋을거 같은데 일단
-    // 그냥 여기다가도 chatUser entity를 import해서 쓰자 일단은
-
     const isChatUser = await this.chatUserRepository.findOne({
       where: { UserId: userId },
     });
@@ -287,22 +282,25 @@ export class UserService {
   }
 
   async block(body: blockDto, user): Promise<void> {
-    const { UserId } = body;
+    const { UserId: BlockedId } = body;
     const { id: userId } = user;
 
-    if (userId === UserId) {
+    if (userId === BlockedId) {
       throw new BadRequestException('자신을 차단할 수 없습니다.');
     }
 
     const isBlocked = await this.blocksRepository.findOne({
-      where: { UserId: userId, BlockedId: UserId },
+      where: { UserId: userId, BlockedId: BlockedId },
     });
 
     if (isBlocked) {
-      throw new BadRequestException('이미 차단한 유저입니다.');
+      await this.blocksRepository.delete({
+        UserId: userId,
+        BlockedId: BlockedId,
+      });
+    } else {
+      await this.blocksRepository.createBlock(BlockedId, userId);
     }
-
-    await this.blocksRepository.createBlock(UserId, userId);
   }
 
   async getBlockList(user): Promise<Blocks[]> {

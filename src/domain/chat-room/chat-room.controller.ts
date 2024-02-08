@@ -23,6 +23,7 @@ import { joinChatRoomDto } from './dto/request.joinChatRoom.dto';
 import { ChatUsers } from '../entities/chatUser';
 import { changeChatRoomStatusDto } from './dto/request.changeChatRoomStatus.dto';
 import { paymentDto } from './dto/request.changePaymentStatus.dto';
+import { kickUserDto } from './dto/request.kickUser.dto';
 
 @ApiTags('채팅방')
 @Controller('chat-room')
@@ -113,6 +114,12 @@ export class ChatRoomController {
     return;
   }
 
-  // @ApiOperation({ summary: '내가 주문한 메뉴 금액 입력하기' })
-  // @ApiOperation({ summary: '내가 입금한 메뉴 금액 불러오기' })
+  @ApiOperation({ summary: '(방장) 참여자 강퇴하기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Post('kick')
+  async kickUser(@Body() body: kickUserDto, @User() user): Promise<void> {
+    await this.chatRoomService.kickUser(body, user);
+    return;
+  }
 }

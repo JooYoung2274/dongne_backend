@@ -152,7 +152,7 @@ export class UserController {
     await this.userService.report(body, user);
   }
 
-  @ApiOperation({ summary: '차단하기' })
+  @ApiOperation({ summary: '차단하기 / 차단 해제하기' })
   @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard('jwt'))
   @Post('block')
