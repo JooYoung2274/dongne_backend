@@ -10,6 +10,7 @@ import { ChatUsers } from './chatUser';
 import { ChatRecords } from './chatRecord';
 import { Friends } from './friend';
 import { Reports } from './report';
+import { Blocks } from './block';
 
 @Entity('users')
 export class Users {
@@ -70,15 +71,24 @@ export class Users {
   @OneToMany(() => ChatRecords, (chatRecord) => chatRecord.User)
   ChatRecord: ChatRecords[];
 
+  //
   @OneToMany(() => Friends, (friend) => friend.User)
   Friends: Friends[];
 
-  @OneToMany(() => Friends, (friend) => friend.User)
+  @OneToMany(() => Friends, (friend) => friend.Friend)
   Owners: Friends[];
 
+  //
   @OneToMany(() => Reports, (report) => report.User)
   Reports: Reports[];
 
-  @OneToMany(() => Reports, (report) => report.User)
+  @OneToMany(() => Reports, (report) => report.Reported)
   Reported: Reports[];
+
+  //
+  @OneToMany(() => Blocks, (block) => block.User)
+  Blocks: Friends[];
+
+  @OneToMany(() => Blocks, (block) => block.Blocked)
+  Blocked: Friends[];
 }

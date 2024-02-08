@@ -8,13 +8,10 @@ import {
 } from 'typeorm';
 import { Users } from './user';
 
-@Entity('reports')
-export class Reports {
+@Entity('blocks')
+export class Blocks {
   @PrimaryGeneratedColumn({ type: 'int', name: 'id' })
   id: number;
-
-  @Column('varchar', { name: 'reason' })
-  reason: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -22,20 +19,20 @@ export class Reports {
   @Column('int', { name: 'UserId' })
   UserId: number;
 
-  @ManyToOne(() => Users, (user) => user.Reports, {
+  @ManyToOne(() => Users, (user) => user.Blocks, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn([{ name: 'UserId', referencedColumnName: 'id' }])
   User: Users;
 
-  @Column('int', { name: 'ReportedId' })
-  ReportedId: number;
+  @Column('int', { name: 'BlockedId' })
+  BlockedId: number;
 
-  @ManyToOne(() => Users, (user) => user.Reported, {
+  @ManyToOne(() => Users, (user) => user.Blocked, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  @JoinColumn([{ name: 'ReportedId', referencedColumnName: 'id' }])
-  Reported: Users;
+  @JoinColumn([{ name: 'BlockedId', referencedColumnName: 'id' }])
+  Blocked: Users;
 }
