@@ -9,6 +9,7 @@ import { UserAreas } from './userArea';
 import { ChatUsers } from './chatUser';
 import { ChatRecords } from './chatRecord';
 import { Friends } from './friend';
+import { Reports } from './report';
 
 @Entity('users')
 export class Users {
@@ -74,4 +75,10 @@ export class Users {
 
   @OneToMany(() => Friends, (friend) => friend.User)
   Owners: Friends[];
+
+  @OneToMany(() => Reports, (report) => report.User)
+  Reports: Reports[];
+
+  @OneToMany(() => Reports, (report) => report.User)
+  Reported: Reports[];
 }

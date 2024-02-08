@@ -9,6 +9,7 @@ import { AxiosClass } from 'src/util/axios.class';
 import { AreaRepository } from './area.repository';
 import { UserAreaRepository } from './user-area.repository';
 import { ChatUserRepository } from './chat-user.repository';
+import { ReportsRepository } from './report.repository';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ChatUserRepository } from './chat-user.repository';
     AreaRepository,
     UserAreaRepository,
     ChatUserRepository,
+    ReportsRepository,
   ],
 })
 export class UserModule {}
