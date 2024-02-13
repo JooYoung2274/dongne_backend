@@ -29,7 +29,7 @@ export class Friends {
   @Column('int', { name: 'FriendId' })
   FriendId: number;
 
-  @ManyToOne(() => Users, (user) => user.Friends, {
+  @ManyToOne(() => Users, (user) => user.Owners, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

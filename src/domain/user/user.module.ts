@@ -10,6 +10,7 @@ import { AreaRepository } from './area.repository';
 import { UserAreaRepository } from './user-area.repository';
 import { ChatUserRepository } from './chat-user.repository';
 import { ReportsRepository } from './report.repository';
+import { BlocksRepository } from './block.repository';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ReportsRepository } from './report.repository';
     UserAreaRepository,
     ChatUserRepository,
     ReportsRepository,
+    BlocksRepository,
   ],
 })
 export class UserModule {}

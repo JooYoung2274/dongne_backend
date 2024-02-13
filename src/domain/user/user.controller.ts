@@ -27,6 +27,7 @@ import { refreshTokenDto } from './dto/request.refresh.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { reportDto } from './dto/request.report.dto';
+import { blockDto } from './dto/request.block.dto';
 
 @ApiTags('유저')
 @Controller('user')
@@ -141,15 +142,29 @@ export class UserController {
     @User() user: any,
   ) {
     await this.userService.editProfileImage(file, user);
-    return;
   }
 
   @ApiOperation({ summary: '신고하기' })
   @ApiBearerAuth('access-token')
   @UseGuards(AuthGuard('jwt'))
   @Post('report')
-  async report(@Body() body: reportDto, @User() user) {
+  async report(@Body() body: reportDto, @User() user): Promise<void> {
     await this.userService.report(body, user);
-    return;
+  }
+
+  @ApiOperation({ summary: '차단하기 / 차단 해제하기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Post('block')
+  async block(@Body() body: blockDto, @User() user): Promise<void> {
+    await this.userService.block(body, user);
+  }
+
+  @ApiOperation({ summary: '내 차단 목록 불러오기' })
+  @ApiBearerAuth('access-token')
+  @UseGuards(AuthGuard('jwt'))
+  @Get('getBlockList')
+  async getBlockList(@User() user): Promise<any> {
+    return await this.userService.getBlockList(user);
   }
 }

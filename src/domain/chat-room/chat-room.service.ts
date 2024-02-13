@@ -12,6 +12,7 @@ import { UserAreaRepository } from '../user/user-area.repository';
 import { ChatUserRepository } from '../user/chat-user.repository';
 import { ChatRecordRepository } from './chat-record.repository';
 import { CategoryRepository } from './category.respository';
+import { kickUserDto } from './dto/request.kickUser.dto';
 
 @Injectable()
 export class ChatRoomService {
@@ -244,5 +245,24 @@ export class ChatRoomService {
     }
 
     return;
+  }
+
+  async kickUser(body: kickUserDto, user): Promise<void> {
+    const { UserId } = body;
+    const { id: userId } = user;
+
+    const isChatUser = await this.chatUserRepository.findOne({
+      where: { UserId: userId },
+    });
+
+    if (!isChatUser) {
+      throw new BadRequestException('참여하고 있는 채팅방이 없습니다');
+    }
+
+    if (!isChatUser.isHost) {
+      throw new BadRequestException('방장만 변경할 수 있습니다');
+    }
+
+    await this.chatUserRepository.delete({ UserId });
   }
 }
