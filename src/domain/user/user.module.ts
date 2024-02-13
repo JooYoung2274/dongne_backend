@@ -27,6 +27,8 @@ import { BlocksRepository } from './block.repository';
     AreaRepository,
     UserAreaRepository,
     ChatUserRepository,
+    ReportsRepository,
+    BlocksRepository,
     GoogleStrategy,
     JwtStrategy,
     AxiosClass,
